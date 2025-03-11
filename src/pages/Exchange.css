@@ -1,0 +1,898 @@
+/* Exchange page styles based on buy.css */
+
+/* Remove the old/duplicated styles at the top */
+
+.exchange-page {
+  padding-top: 0;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.exchange-hero {
+  background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+  color: white;
+  padding: 100px 0 80px;
+  text-align: center;
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.exchange-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background-color: #f8f9fa;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.exchange-hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.exchange-hero p {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Filter styles from Buy.css */
+.search-filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+  align-items: center;
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* For MUI components if used */
+.search-bar .MuiOutlinedInput-root {
+  border-radius: 30px;
+  background-color: #f5f5f5;
+  transition: all 0.3s ease;
+}
+
+.search-bar .MuiOutlinedInput-root:hover {
+  background-color: #eeeeee;
+}
+
+.search-bar .MuiOutlinedInput-root.Mui-focused {
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+/* For non-MUI inputs */
+.search-input {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: 1px solid #e0e0e0;
+  background-color: #f5f5f5;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-input:hover {
+  background-color: #eeeeee;
+}
+
+.search-input:focus {
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+.MuiOutlinedInput-root {
+  position: relative;
+  border-radius: 30px;
+  background-color: #f5f5f5;
+  transition: all 0.3s ease;
+}
+
+.MuiOutlinedInput-input {
+  padding: 16.5px 14px;
+}
+
+.MuiOutlinedInput-root:hover {
+  background-color: #eeeeee;
+}
+
+.MuiOutlinedInput-root.Mui-focused {
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+.MuiFormControl-root {
+  margin: 0;
+  min-width: 120px;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-dropdown {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: 1px solid #e0e0e0;
+  background-color: #f5f5f5;
+  font-size: 1rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23757575'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  padding-right: 30px;
+}
+
+.filter-dropdown:hover {
+  background-color: #eeeeee;
+}
+
+.filter-dropdown:focus {
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+/* Keep exchange-now-btn instead of buy-now-btn */
+.exchange-now-btn {
+  border-radius: 30px;
+  text-transform: none;
+  font-weight: 600;
+  padding: 14px 18px;
+  background: linear-gradient(45deg, #3f51b5 20%, #7986cb 100%);
+  box-shadow: 0 4px 10px rgba(63, 81, 181, 0.3);
+  transition: all 0.3s ease;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.exchange-now-btn:hover {
+  box-shadow: 0 6px 14px rgba(63, 81, 181, 0.4);
+  transform: translateY(-3px);
+}
+
+/* Add these filter-button-mobile styles from Buy.css */
+.filter-button-mobile {
+  display: none; /* Hidden by default, shown on mobile */
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 30px;
+  background-color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s ease;
+}
+
+.filter-button-mobile:hover {
+  background-color: #f5f5f5;
+}
+
+/* Keep the rest of the styles from the exchange.css file */
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+/* Enhanced card styling - new design */
+.account-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.5s cubic-bezier(0.15, 0.9, 0.34, 0.95);
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  border: none;
+  background-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07), 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.account-card:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 20px 40px rgba(63, 81, 181, 0.16), 0 4px 12px rgba(63, 81, 181, 0.1);
+}
+
+.account-image-container {
+  position: relative;
+  overflow: hidden;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  height: 200px;
+}
+
+.account-image {
+  transition: transform 1s cubic-bezier(0.33, 1, 0.68, 1), filter 0.5s ease;
+  object-fit: cover;
+  filter: brightness(0.95);
+  width: 100%;
+  height: 100%;
+}
+
+.account-card:hover .account-image {
+  transform: scale(1.07);
+  filter: brightness(1.05);
+}
+
+.account-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, 
+    rgba(0, 0, 0, 0.2) 0%, 
+    rgba(63, 81, 181, 0.3) 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+
+.account-card:hover .account-overlay {
+  opacity: 1;
+}
+
+.view-details-btn {
+  transform: translateY(20px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 30px;
+  padding: 10px 26px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  background: linear-gradient(45deg, #3f51b5 20%, #7986cb 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(63, 81, 181, 0.35);
+}
+
+.account-card:hover .view-details-btn {
+  transform: translateY(0);
+}
+
+.view-details-btn:hover {
+  background: linear-gradient(45deg, #303f9f 20%, #5c6bc0 100%);
+  box-shadow: 0 8px 20px rgba(63, 81, 181, 0.5);
+}
+
+.card-badges {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+   flex-direction: row-reverse;
+  align-items: flex-end;
+  gap: 90%;
+  z-index: 5;
+}
+
+.verified-badge {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #3f51b5;
+}
+
+.verified-badge-icon {
+  color: #3f51b5;
+  font-size: 16px;
+}
+
+.account-card:hover .verified-badge {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+.card-content {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.account-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 1.15rem;
+  margin-bottom: 12px;
+  transition: color 0.3s ease;
+}
+
+.account-card:hover .account-title {
+  color: #3f51b5;
+}
+
+.account-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin-bottom: 14px;
+  color: #5f6368;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.account-price {
+  font-weight: 700;
+  color: #3f51b5;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.account-card:hover .account-price {
+  transform: scale(1.05);
+}
+
+.price-currency {
+  font-size: 0.9rem;
+  margin-right: 2px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Custom chips */
+.platform-chip {
+  background-color: rgba(63, 81, 181, 0.08);
+  color: #3f51b5;
+  font-weight: 500;
+  border-radius: 20px;
+  transition: all 0.25s ease;
+  box-shadow: none;
+  padding: 0 12px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.platform-chip:hover {
+  background-color: rgba(63, 81, 181, 0.15);
+  transform: translateY(-2px);
+}
+
+.category-chip {
+  background-color: rgba(0, 137, 123, 0.08);
+  color: #00897b;
+  font-weight: 500;
+  border-radius: 20px;
+  transition: all 0.25s ease;
+  box-shadow: none;
+  padding: 0 12px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.category-chip:hover {
+  background-color: rgba(0, 137, 123, 0.15);
+  transform: translateY(-2px);
+}
+
+.feature-chip {
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 20px;
+  color: #616161;
+  transition: all 0.25s ease;
+  font-weight: 500;
+  padding: 0 12px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.feature-chip:hover {
+  background-color: #eeeeee;
+  transform: translateY(-2px);
+}
+
+.card-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.rating-container {
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.rating-count {
+  margin-left: 8px;
+  color: #757575;
+  font-size: 0.85rem;
+}
+
+/* Responsive styles */
+@media (max-width: 960px) {
+  .search-filter-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-bar,
+  .filter-controls {
+    width: 100%;
+  }
+  
+  .exchange-hero {
+    padding: 80px 0 60px;
+  }
+  
+  .exchange-hero h1 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .exchange-hero {
+    padding: 70px 0 50px;
+  }
+  
+  .exchange-hero::after {
+    bottom: -20px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .exchange-hero {
+    padding: 60px 0 40px;
+  }
+  
+  .accounts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Enhanced responsive styles for filter section from Buy.css */
+@media (max-width: 1024px) {
+  .filter-controls {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .filter-controls .MuiFormControl-root {
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 600px) {
+  .filter-controls > :not(.filter-button-mobile) {
+    display: none;
+  }
+  
+  .filter-button-mobile {
+    display: flex;
+    margin-left: auto;
+  }
+  
+  .filter-controls .MuiFormControl-root {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+/* Update filter section styling to match Buy.css exactly */
+.search-filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+  align-items: center;
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar {
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-bar .MuiOutlinedInput-root {
+  border-radius: 30px;
+  background-color: #f5f5f5;
+  transition: all 0.3s ease;
+}
+
+.search-bar .MuiOutlinedInput-root:hover {
+  background-color: #eeeeee;
+}
+
+.search-bar .MuiOutlinedInput-root.Mui-focused {
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+.filter-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-controls .MuiFormControl-root {
+  min-width: 150px;
+}
+
+.filter-controls .MuiOutlinedInput-root {
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.filter-controls .MuiOutlinedInput-root:hover {
+  background-color: #eeeeee;
+}
+
+.filter-controls .MuiOutlinedInput-root.Mui-focused {
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.15);
+}
+
+.filter-button-desktop {
+  white-space: nowrap;
+  background-color: #f5f5f5 !important;
+  border-color: #e0e0e0 !important;
+  color: #616161 !important;
+  text-transform: none !important;
+  border-radius: 12px !important;
+  padding: 6px 16px !important;
+  transition: all 0.3s ease !important;
+}
+
+.filter-button-desktop:hover {
+  background-color: #eeeeee !important;
+  border-color: #d5d5d5 !important;
+}
+
+.filter-button-mobile {
+  display: none !important;
+  background-color: #f5f5f5 !important;
+  padding: 8px !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.filter-button-mobile:hover {
+  background-color: #eeeeee !important;
+}
+
+/* Hide the old style filter-dropdown used in non-MUI version */
+.filter-dropdown {
+  display: none;
+}
+
+/* Update responsive styles for filter section */
+@media (max-width: 1024px) {
+  .filter-controls {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .filter-controls .MuiFormControl-root {
+    min-width: 150px;
+  }
+  
+  .filter-button-desktop {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .filter-controls > *:not(.filter-button-mobile) {
+    display: none !important;
+  }
+  
+  .filter-button-mobile {
+    display: flex !important;
+    margin-left: auto;
+  }
+  
+  .filter-controls .MuiFormControl-root {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+/* View toggle styles */
+.view-toggle-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.view-toggle-container .MuiToggleButtonGroup-root {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.view-toggle-container .MuiToggleButton-root {
+  padding: 8px 16px;
+  border-color: #e0e0e0;
+  color: #757575;
+}
+
+.view-toggle-container .MuiToggleButton-root.Mui-selected {
+  background-color: rgba(63, 81, 181, 0.08);
+  color: #3f51b5;
+}
+
+/* List view styles */
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.account-card.list-view {
+  flex-direction: column;
+  height: auto;
+  border-radius: 20px;
+}
+
+.account-card.list-view .list-view-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.account-card.list-view .list-view-image {
+  position: relative;
+  width: 280px;
+  min-width: 280px;
+  overflow: hidden;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.account-card.list-view .account-image {
+  height: 100%;
+  object-fit: cover;
+}
+
+.account-card.list-view .list-view-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.account-card.list-view .list-view-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.account-card.list-view .list-view-title-section {
+  flex: 1;
+}
+
+.account-card.list-view .list-view-price {
+  background: rgba(63, 81, 181, 0.08);
+  padding: 10px 16px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  height: fit-content;
+}
+
+.account-card.list-view:hover .list-view-price {
+  transform: scale(1.05);
+  background: rgba(63, 81, 181, 0.12);
+}
+
+.account-card.list-view .list-view-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.account-card.list-view .list-view-footer {
+  margin-top: auto;
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.account-card.list-view .date-added {
+  color: #757575;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.account-card.list-view .action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.account-card.list-view .details-btn {
+  border-radius: 30px;
+  text-transform: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1.5px solid #3f51b5;
+  color: #3f51b5;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.account-card.list-view .details-btn:hover {
+  background-color: rgba(63, 81, 181, 0.04);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(63, 81, 181, 0.15);
+}
+
+/* Responsive styles for list view */
+@media (max-width: 768px) {
+  .account-card.list-view .list-view-container {
+    flex-direction: column;
+  }
+  
+  .account-card.list-view .list-view-image {
+    width: 100%;
+    min-width: 100%;
+    max-height: 200px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 0;
+  }
+  
+  .account-card.list-view .list-view-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .account-card.list-view .action-buttons {
+    width: 100%;
+    gap: 10px;
+  }
+  
+  .account-card.list-view .details-btn,
+  .account-card.list-view .exchange-now-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* Enhanced platform dropdown styling */
+.filter-controls .MuiSelect-select {
+  padding-right: 32px !important;
+}
+
+.filter-controls .Mui-disabled {
+  background-color: #f5f5f5;
+  opacity: 0.7;
+}
+
+.account-type-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+  color: #3f51b5;
+}
+
+/* Customized platform dropdown menu */
+.MuiMenu-paper .MuiMenuItem-root {
+  min-height: 42px;
+}
+
+.platform-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Category chips updated to reflect more account types */
+.gaming-chip {
+  background-color: rgba(63, 81, 181, 0.08) !important;
+  color: #3f51b5 !important;
+}
+
+.social-chip {
+  background-color: rgba(233, 30, 99, 0.08) !important;
+  color: #e91e63 !important;
+}
+
+.streaming-chip {
+  background-color: rgba(0, 137, 123, 0.08) !important;
+  color: #00897b !important;
+}
+
+.finance-chip {
+  background-color: rgba(76, 175, 80, 0.08) !important;
+  color: #4caf50 !important;
+}
+
+.ecommerce-chip {
+  background-color: rgba(255, 152, 0, 0.08) !important;
+  color: #ff9800 !important;
+}
