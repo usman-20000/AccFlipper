@@ -50,15 +50,16 @@ function Login() {
             const body = isSignup
                 ? JSON.stringify(formData)
                 : JSON.stringify({ email: formData.email, password: formData.password });
-
             const response = await fetch(url, { method, headers, body });
             const data = await response.json();
 
             if (response.ok) {
                 console.log('response:', data.data);
-                localStorage.setItem('id', data.data.id);
                 if (!isSignup) {
+                    localStorage.setItem('id', data.data.id);
                     navigate('/Home');
+                } else {
+                    setIsSignup(false);
                 }
             } else {
                 alert(data.message);

@@ -95,13 +95,20 @@ const Header = () => {
                 </a>
               </li>
             ))}
-            {!loggedIn && <li className="cta-nav-item" style={{ "--item-index": navItems.length }}>
+            {!loggedIn ? <li className="cta-nav-item" style={{ "--item-index": navItems.length }}>
               <a
                 href="/login"
                 className="nav-cta"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sign In / Register
+              </a>
+            </li> : <li className="--item-index">
+              <a
+                href={'/Login'}
+                onClick={() => { setMobileMenuOpen(false); localStorage.clear(); }}
+              >
+                Logout
               </a>
             </li>}
           </ul>
