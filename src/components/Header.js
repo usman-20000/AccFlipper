@@ -61,6 +61,7 @@ const Header = () => {
     { name: 'Exchange', path: '/exchange' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
+    { name: 'Profile', path: loggedIn ? '/Profile' : '/Login' },
   ];
 
   return (

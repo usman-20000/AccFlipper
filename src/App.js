@@ -16,6 +16,7 @@ import ScrollToTopButton from './components/ScrollToTopButton';
 import ErrorBoundary from './ErrorBoundary';
 import { initializeCounters } from './utils/animations';
 import './App.css';
+import Profile from './pages/Profile';
 
 // Try to import AOS, but don't break if it's not installed
 let AOS;
@@ -116,6 +117,7 @@ function App() {
                   <Route path="/exchange" element={<Exchange />} /> 
                   <Route path="/" element={<Home />} />
                   <Route path="/home" element={<Home />} />
+                  <Route path="/Profile" element={<Profile/>} />
                 </Routes>
               </main>
               <Footer />
