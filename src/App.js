@@ -4,7 +4,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import About from './pages/About'; 
+import About from './pages/About';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Contact from './pages/Contact';
@@ -17,6 +17,7 @@ import ErrorBoundary from './ErrorBoundary';
 import { initializeCounters } from './utils/animations';
 import './App.css';
 import Profile from './pages/Profile';
+import PrivateRoute from './components/PrivateRoute';
 
 // Try to import AOS, but don't break if it's not installed
 let AOS;
@@ -25,9 +26,9 @@ try {
   require('aos/dist/aos.css');
 } catch (e) {
   console.warn("AOS library is not installed. Run 'npm install aos' to enable animations.");
-  AOS = { 
-    init: () => {}, 
-    refresh: () => {} 
+  AOS = {
+    init: () => { },
+    refresh: () => { }
   }; // Mock AOS if not available
 }
 
@@ -37,7 +38,7 @@ function App() {
 
   const finishLoading = () => {
     setLoading(false);
-    
+
     // Give a small delay to ensure smooth transition
     setTimeout(() => {
       window.scrollTo(0, 0);
@@ -48,7 +49,7 @@ function App() {
   useEffect(() => {
     // Lock scroll during loading
     document.body.style.overflow = 'hidden';
-    
+
     // Initialize AOS if available
     if (AOS) {
       AOS.init({
@@ -72,7 +73,7 @@ function App() {
         setContentLoaded(true); // Continue anyway to prevent getting stuck
       }
     };
-    
+
     preloadResources();
 
     // Cleanup function
@@ -97,9 +98,9 @@ function App() {
       <ErrorBoundary>
         <div className="app">
           {loading ? (
-            <LoadingScreen 
-              finishLoading={finishLoading} 
-              contentLoaded={contentLoaded} 
+            <LoadingScreen
+              finishLoading={finishLoading}
+              contentLoaded={contentLoaded}
             />
           ) : (
             <>
@@ -113,11 +114,13 @@ function App() {
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/buy" element={<Buy />} />
-                  <Route path="/sell" element={<Sell />} />
-                  <Route path="/exchange" element={<Exchange />} /> 
+                  <Route path="/exchange" element={<Exchange />} />
                   <Route path="/" element={<Home />} />
                   <Route path="/home" element={<Home />} />
-                  <Route path="/Profile" element={<Profile/>} />
+                  <Route element={<PrivateRoute />}>
+                    <Route path="/Profile" element={<Profile />} />
+                    <Route path="/sell" element={<Sell />} />
+                  </Route>
                 </Routes>
               </main>
               <Footer />

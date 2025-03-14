@@ -5,6 +5,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
   // Handle scroll detection for header state changes
   useEffect(() => {
@@ -54,14 +55,17 @@ const Header = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  const toggleProfileMenu = () => {
+    setProfileMenuOpen(!profileMenuOpen);
+  };
+
   const navItems = [
-    { name: 'Home', path: '/' },
-    { name: 'Buy', path: '/buy' },
-    { name: 'Sell', path: '/sell' },
-    { name: 'Exchange', path: '/exchange' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
-    { name: 'Profile', path: loggedIn ? '/Profile' : '/Login' },
+    mobileMenuOpen && { name: 'Profile', path: '/Profile', onclick: () => setMobileMenuOpen(false) },
+    { name: 'Home', path: '/', onclick: () => setMobileMenuOpen(false) },
+    { name: 'Buy', path: '/buy', onclick: () => setMobileMenuOpen(false) },
+    { name: 'Sell', path: '/sell', onclick: () => setMobileMenuOpen(false) },
+    { name: 'Exchange', path: '/exchange', onclick: () => setMobileMenuOpen(false) },
+    mobileMenuOpen && { name: 'Logout', path: '/Login', onclick: () => { setMobileMenuOpen(false); localStorage.clear(); } },
   ];
 
   return (
@@ -90,28 +94,41 @@ const Header = () => {
               <li key={index} style={{ "--item-index": index }}>
                 <a
                   href={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={item.onClick}
                 >
                   {item.name}
                 </a>
               </li>
+
             ))}
-            {!loggedIn ? <li className="cta-nav-item" style={{ "--item-index": navItems.length }}>
-              <a
-                href="/login"
-                className="nav-cta"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign In / Register
-              </a>
-            </li> : <li className="--item-index">
-              <a
-                href={'/Login'}
-                onClick={() => { setMobileMenuOpen(false); localStorage.clear(); }}
-              >
-                Logout
-              </a>
-            </li>}
+            {!loggedIn ? (
+              <li className="cta-nav-item" style={{ "--item-index": navItems.length }}>
+                <a
+                  href="/login"
+                  className="nav-cta"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign In / Register
+                </a>
+              </li>
+            ) : (
+              <>
+                {!mobileMenuOpen && <li className="profile-nav-item" style={{ "--item-index": navItems.length }}>
+                  <button
+                    className="profile-button"
+                    onClick={toggleProfileMenu}
+                  >
+                    <img src={require('../assets/images/user.png')} style={{ height: 30, width: 30, marginTop: '15%' }} />
+                  </button>
+                  {profileMenuOpen && (
+                    <div className="profile-dropdown">
+                      <a href="/Profile" onClick={() => setProfileMenuOpen(false)}>Profile</a>
+                      <a href="/Login" onClick={() => { setProfileMenuOpen(false); localStorage.clear(); }}>Logout</a>
+                    </div>
+                  )}
+                </li>}
+              </>
+            )}
           </ul>
         </nav>
 

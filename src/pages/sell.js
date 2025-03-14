@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './sell.css';
+import { BaseUrl } from '../utils/data';
+import { imageListItemBarClasses } from '@mui/material';
 
 const Sell = () => {
     const [formData, setFormData] = useState({
@@ -28,6 +30,10 @@ const Sell = () => {
     const [submitted, setSubmitted] = useState(false);
     const [csrfToken, setCsrfToken] = useState('');
     const [transactionMode, setTransactionMode] = useState('single'); // 'single' or 'multiple'
+    const [image, setImage] = useState(null);
+    const [imageUrl, setImageUrl] = useState("");
+
+    let CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dgh6eftpe/image/upload";
 
     // Define platform options for each account type
     const platformsByType = {
@@ -105,6 +111,10 @@ const Sell = () => {
         return platformsByType[formData.accountType] || platformsByType.other;
     };
 
+    const handleFileChange = (event) => {
+        setImage(event.target.files[0]);
+    };
+
     // Reset platform when account type changes
     useEffect(() => {
         // Reset platform when account type changes
@@ -122,8 +132,8 @@ const Sell = () => {
     }, []);
 
     const generateCSRFToken = () => {
-        return Math.random().toString(36).substring(2, 15) + 
-               Math.random().toString(36).substring(2, 15);
+        return Math.random().toString(36).substring(2, 15) +
+            Math.random().toString(36).substring(2, 15);
     };
 
     const handleChange = (e) => {
@@ -132,7 +142,7 @@ const Sell = () => {
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
-        
+
         // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: null }));
@@ -141,143 +151,181 @@ const Sell = () => {
 
     const validateForm = () => {
         const newErrors = {};
-        
+
         if (!formData.accountName.trim()) newErrors.accountName = 'Account name is required';
-        
+
         if (!formData.accountURL.trim()) {
             newErrors.accountURL = 'Account URL is required';
         } else if (!/^https?:\/\/.+/.test(formData.accountURL)) {
             newErrors.accountURL = 'Please enter a valid URL starting with http:// or https://';
         }
-        
+
         if (!formData.accountAge) {
             newErrors.accountAge = 'Account age is required';
         } else if (parseFloat(formData.accountAge) < 0) {
             newErrors.accountAge = 'Age cannot be negative';
         }
-        
+
         if (!formData.accountType) newErrors.accountType = 'Please select an account type';
         if (!formData.accountDescription.trim()) newErrors.accountDescription = 'Description is required';
-        
+
         if (!formData.accountPrice) {
             newErrors.accountPrice = 'Price is required';
         } else if (parseFloat(formData.accountPrice) < 0) {
             newErrors.accountPrice = 'Price cannot be negative';
         }
-        
+
         if (!formData.contactEmail.trim()) {
             newErrors.contactEmail = 'Email is required';
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail)) {
             newErrors.contactEmail = 'Please enter a valid email address';
         }
-        
+
         if (!formData.termsAgree) newErrors.termsAgree = 'You must agree to the terms';
-        
+
         // Only validate exchange requirements if exchange is selected
         if (formData.transactionType.exchange && !formData.exchangeRequirements.trim()) {
             newErrors.exchangeRequirements = 'Please specify what you\'re looking to exchange for';
         }
-        
+
         // Validate followers if provided
         if (formData.followers && isNaN(Number(formData.followers))) {
             newErrors.followers = 'Followers must be a number';
         }
-        
+
         // Validate revenue if provided
         if (formData.revenue && isNaN(Number(formData.revenue))) {
             newErrors.revenue = 'Revenue must be a number';
         }
-        
+
         // Validate phone if provided
         if (formData.phoneNumber && !/^\+?[\d\s-]{8,}$/.test(formData.phoneNumber)) {
             newErrors.phoneNumber = 'Please enter a valid phone number';
         }
-        
+
         return newErrors;
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        // Validate form
-        const formErrors = validateForm();
-        if (Object.keys(formErrors).length > 0) {
-            setErrors(formErrors);
-            return;
-        }
-        
-        // Validate CSRF token
-        const storedToken = sessionStorage.getItem('csrfToken');
-        if (csrfToken !== storedToken) {
-            showMessage('Security error. Please refresh the page and try again.', 'error');
-            return;
-        }
-        
         try {
-            // In a real app, you would send this data to your server
-            // const response = await fetch('/api/listings', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'X-CSRF-Token': csrfToken
-            //     },
-            //     body: JSON.stringify(formData)
-            // });
-            
-            // Simulating success for demonstration
-            console.log('Form submitted with data:', formData);
-            
-            // Reset form after successful submission
-            setFormData({
-                accountName: '',
-                accountURL: '',
-                accountAge: '',
-                accountType: '',
-                accountDescription: '',
-                accountPrice: '',
-                contactEmail: '',
-                phoneNumber: '',
-                followers: '',
-                engagement: '',
-                revenue: '',
-                platform: '',
-                transactionType: {
+            e.preventDefault();
+    
+
+            // const formErrors = validateForm();
+            // if (Object.keys(formErrors).length > 0) {
+            //     setErrors(formErrors);
+            //     return;
+            // }
+
+            const id = localStorage.getItem('id');
+            if (!id) {
+                alert('Please login to submit a listing.');
+                return;
+            }
+    
+            if (!image) {
+                alert('Please upload an image.');
+                return;
+            }
+    
+            let form = new FormData();
+            form.append('file', image);
+            form.append('upload_preset', 'FirstAccFlipper_preset');
+            form.append('cloud_name', 'dgh6eftpe');
+    
+            const cloudinaryResponse = await fetch(CLOUDINARY_URL, {
+                method: 'POST',
+                body: form,
+            });
+    
+            const cloudinaryData = await cloudinaryResponse.json();
+            console.log('Cloudinary Response:', cloudinaryData.secure_url);
+    
+            if (!cloudinaryData.secure_url) {
+                alert('Image upload failed. Please try again.');
+                return;
+            }
+    
+            // Prepare listing data
+            const listingData = {
+                userId: id,
+                accountName: formData.accountName || '',
+                accountURL: formData.accountURL || '',
+                accountAge: formData.accountAge || '',
+                accountType: formData.accountType || '',
+                uploadImage: cloudinaryData.secure_url || '', 
+                accountDescription: formData.accountDescription || '',
+                accountPrice: formData.accountPrice || '',
+                contactEmail: formData.contactEmail || '',
+                phoneNumber: formData.phoneNumber || '',
+                followers: formData.followers || '',
+                engagement: formData.engagement || '',
+                revenue: formData.revenue || '',
+                platform: formData.platform || 'YouTube', 
+                transactionType: formData.transactionType || {
                     sell: true,
                     valuation: false,
                     exchange: false
                 },
-                exchangeRequirements: '',
-                preferredPayment: 'paypal',
-                termsAgree: false
+                exchangeRequirements: formData.exchangeRequirements || '',
+                preferredPayment: formData.preferredPayment || 'paypal',
+                termsAgree: formData.termsAgree || false
+            };
+    
+            console.log('Final Data Sent:', listingData);
+    
+            const response = await fetch(`${BaseUrl}/listing`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(listingData)
             });
-            
-            setSubmitted(true);
-            showMessage('Your account listing has been submitted successfully!', 'success');
-            
-            // Generate new CSRF token for next submission
-            const newToken = generateCSRFToken();
-            setCsrfToken(newToken);
-            sessionStorage.setItem('csrfToken', newToken);
+    
+            const result = await response.json();
+    
+            if (!response.ok) {
+                console.error('API Error:', result);
+                alert(`Error: ${result.message || 'Failed to submit'}`);
+                return;
+            }
+    
+            console.log('Success:', result);
+            alert('Uploaded successfully!');
+    
         } catch (error) {
             console.error('Error submitting form:', error);
-            showMessage('There was a problem submitting your listing. Please try again.', 'error');
+            alert('There was a problem submitting your listing. Please try again.');
         }
     };
 
-    const showMessage = (message, type) => {
-        const messageContainer = document.createElement('div');
-        messageContainer.className = `message ${type}`;
-        messageContainer.textContent = message;
-        
-        const form = document.getElementById('sellAccountForm');
-        form.parentNode.insertBefore(messageContainer, form);
-        
-        // Remove the message after 5 seconds
-        setTimeout(() => {
-            messageContainer.remove();
-        }, 5000);
-    };
+    
 
+    const handleUpload = async () => {
+        try {
+            if (!image) {
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('file', image);
+            formData.append('upload_preset', 'FirstAccFlipper_preset');
+            formData.append('cloud_name', 'dgh6eftpe');
+
+            fetch(CLOUDINARY_URL, {
+                method: 'POST',
+                body: formData,
+            }).then(async r => {
+                let data = await r.json();
+                console.log(data);
+                if (data.secure_url) {
+                    // Use the secure URL in your REST API
+                    console.log(data.secure_url);
+                    alert('Uploaded successfully...');
+                }
+            }).catch(err => console.log(err));
+        } catch (err) {
+            console.log(err);
+        }
+    };
     const handleTransactionTypeChange = (type) => {
         if (transactionMode === 'single') {
             // In single mode, only one option can be selected
@@ -298,13 +346,13 @@ const Sell = () => {
                     [type]: !prev.transactionType[type]
                 }
             }));
-            
+
             // After toggling, check if all options are now deselected
             setTimeout(() => {
-                const allDeselected = !formData.transactionType.sell && 
-                                   !formData.transactionType.valuation && 
-                                   !formData.transactionType.exchange;
-                
+                const allDeselected = !formData.transactionType.sell &&
+                    !formData.transactionType.valuation &&
+                    !formData.transactionType.exchange;
+
                 // If all are deselected, force the clicked one to be selected
                 if (allDeselected) {
                     setFormData(prev => ({
@@ -326,7 +374,7 @@ const Sell = () => {
             // When switching back to single mode, keep only the first selected option
             const types = ['sell', 'valuation', 'exchange'];
             const selectedType = types.find(type => formData.transactionType[type]) || 'sell';
-            
+
             setTransactionMode('single');
             setFormData(prev => ({
                 ...prev,
@@ -338,23 +386,23 @@ const Sell = () => {
             }));
         }
     };
-    
+
     // Helper to determine if any transaction type is selected
     const isAnyTransactionSelected = () => {
-        return formData.transactionType.sell || 
-               formData.transactionType.valuation || 
-               formData.transactionType.exchange;
+        return formData.transactionType.sell ||
+            formData.transactionType.valuation ||
+            formData.transactionType.exchange;
     };
-    
+
     // This function determines the button class based on the selected transaction types
     const getSubmitButtonClass = () => {
         const { sell, valuation, exchange } = formData.transactionType;
-        
+
         if (sell && !valuation && !exchange) return 'submit-btn sell';
         if (!sell && valuation && !exchange) return 'submit-btn valuation';
         if (!sell && !valuation && exchange) return 'submit-btn exchange';
         if (sell || valuation || exchange) return 'submit-btn multiple';
-        
+
         return 'submit-btn';
     };
 
@@ -362,15 +410,15 @@ const Sell = () => {
         <div className="sell-page">
             <div className="form-container">
                 <h2>List Your Account</h2>
-                
+
                 <div className={`transaction-type-selector ${transactionMode === 'multiple' ? 'multiple-mode' : ''}`}>
                     <div className="transaction-header">
                         <h3>What would you like to do with your account?</h3>
                         <div className={`transaction-mode-toggle ${transactionMode === 'multiple' ? 'active' : ''}`}>
                             <label className="toggle-switch">
-                                <input 
-                                    type="checkbox" 
-                                    checked={transactionMode === 'multiple'} 
+                                <input
+                                    type="checkbox"
+                                    checked={transactionMode === 'multiple'}
                                     onChange={toggleTransactionMode}
                                 />
                                 <span className="toggle-slider"></span>
@@ -380,9 +428,9 @@ const Sell = () => {
                             </span>
                         </div>
                     </div>
-                    
+
                     <div className={`transaction-options ${transactionMode === 'multiple' ? 'multiple-mode' : ''}`}>
-                        <div 
+                        <div
                             className={`transaction-option ${formData.transactionType.sell ? 'selected' : ''}`}
                             onClick={() => handleTransactionTypeChange('sell')}
                         >
@@ -390,7 +438,7 @@ const Sell = () => {
                                 type="checkbox"
                                 id="sellOption"
                                 checked={formData.transactionType.sell}
-                                onChange={() => {}}
+                                onChange={() => { }}
                             />
                             <label htmlFor="sellOption">
                                 <span className="option-icon">💰</span>
@@ -398,8 +446,8 @@ const Sell = () => {
                                 <span className="option-description">List your account for sale</span>
                             </label>
                         </div>
-                        
-                        <div 
+
+                        <div
                             className={`transaction-option ${formData.transactionType.valuation ? 'selected' : ''}`}
                             onClick={() => handleTransactionTypeChange('valuation')}
                         >
@@ -407,7 +455,7 @@ const Sell = () => {
                                 type="checkbox"
                                 id="valuationOption"
                                 checked={formData.transactionType.valuation}
-                                onChange={() => {}}
+                                onChange={() => { }}
                             />
                             <label htmlFor="valuationOption">
                                 <span className="option-icon">📊</span>
@@ -415,8 +463,8 @@ const Sell = () => {
                                 <span className="option-description">Find out what your account is worth</span>
                             </label>
                         </div>
-                        
-                        <div 
+
+                        <div
                             className={`transaction-option ${formData.transactionType.exchange ? 'selected' : ''}`}
                             onClick={() => handleTransactionTypeChange('exchange')}
                         >
@@ -424,7 +472,7 @@ const Sell = () => {
                                 type="checkbox"
                                 id="exchangeOption"
                                 checked={formData.transactionType.exchange}
-                                onChange={() => {}}
+                                onChange={() => { }}
                             />
                             <label htmlFor="exchangeOption">
                                 <span className="option-icon">🔄</span>
@@ -433,45 +481,45 @@ const Sell = () => {
                             </label>
                         </div>
                     </div>
-                    
+
                     {!isAnyTransactionSelected() && (
                         <div className="transaction-warning">
                             Please select at least one option to proceed
                         </div>
                     )}
-                    
+
                     {transactionMode === 'multiple' && (
                         <div className="transaction-info">
                             <i className="info-icon">ℹ️</i> Click on multiple boxes to combine options (e.g., sell AND get a valuation)
                         </div>
                     )}
                 </div>
-                
+
                 <form id="sellAccountForm" onSubmit={handleSubmit}>
                     <input type="hidden" name="csrf_token" value={csrfToken} />
-                    
+
                     <div className="form-section">
                         <h3>Account Details</h3>
-                        
+
                         <div className="form-group">
                             <label htmlFor="accountName">Account Name *</label>
-                            <input 
-                                type="text" 
-                                id="accountName" 
-                                name="accountName" 
+                            <input
+                                type="text"
+                                id="accountName"
+                                name="accountName"
                                 value={formData.accountName}
                                 onChange={handleChange}
                                 className={errors.accountName ? 'error' : ''}
                             />
                             {errors.accountName && <span className="error-message">{errors.accountName}</span>}
                         </div>
-                        
+
                         <div className="form-group">
                             <label htmlFor="accountURL">Account URL *</label>
-                            <input 
-                                type="url" 
-                                id="accountURL" 
-                                name="accountURL" 
+                            <input
+                                type="url"
+                                id="accountURL"
+                                name="accountURL"
                                 placeholder="https://example.com"
                                 value={formData.accountURL}
                                 onChange={handleChange}
@@ -479,14 +527,14 @@ const Sell = () => {
                             />
                             {errors.accountURL && <span className="error-message">{errors.accountURL}</span>}
                         </div>
-                        
+
                         <div className="form-group">
                             <label htmlFor="accountAge">Account Age (years) *</label>
-                            <input 
-                                type="number" 
-                                id="accountAge" 
-                                name="accountAge" 
-                                min="0" 
+                            <input
+                                type="number"
+                                id="accountAge"
+                                name="accountAge"
+                                min="0"
                                 step="0.1"
                                 value={formData.accountAge}
                                 onChange={handleChange}
@@ -494,11 +542,11 @@ const Sell = () => {
                             />
                             {errors.accountAge && <span className="error-message">{errors.accountAge}</span>}
                         </div>
-                        
+
                         <div className="form-group">
                             <label htmlFor="accountType">Account Type *</label>
-                            <select 
-                                id="accountType" 
+                            <select
+                                id="accountType"
                                 name="accountType"
                                 value={formData.accountType}
                                 onChange={handleChange}
@@ -515,17 +563,16 @@ const Sell = () => {
                             </select>
                             {errors.accountType && <span className="error-message">{errors.accountType}</span>}
                         </div>
-                        
+
                         {formData.accountType && (
                             <div className="form-group">
                                 <label htmlFor="platform">Platform *</label>
-                                <select 
-                                    id="platform" 
+                                <select
+                                    id="platform"
                                     name="platform"
                                     value={formData.platform}
                                     onChange={handleChange}
-                                    className={errors.platform ? 'error' : ''}
-                                >
+                                    className={errors.platform ? 'error' : ''}>
                                     <option value="">Select platform</option>
                                     {getAvailablePlatforms().map(platform => (
                                         <option key={platform.value} value={platform.value}>
@@ -536,17 +583,27 @@ const Sell = () => {
                                 {errors.platform && <span className="error-message">{errors.platform}</span>}
                             </div>
                         )}
+                        <div className="form-group">
+                            <label htmlFor="contactEmail">Upload Image *</label>
+                            <input
+                                type="file"
+                                id="updloadImage"
+                                name="updloadImage"
+                                onChange={handleFileChange}
+                                className={errors.contactEmail ? 'error' : ''}
+                            />
+                        </div>
                     </div>
-                    
+
                     <div className="form-section">
                         <h3>Performance Metrics</h3>
-                        
+
                         <div className="form-row">
                             <div className="form-group">
                                 <label htmlFor="followers">Followers/Subscribers</label>
-                                <input 
-                                    type="text" 
-                                    id="followers" 
+                                <input
+                                    type="text"
+                                    id="followers"
                                     name="followers"
                                     placeholder="e.g., 10000"
                                     value={formData.followers}
@@ -555,12 +612,12 @@ const Sell = () => {
                                 />
                                 {errors.followers && <span className="error-message">{errors.followers}</span>}
                             </div>
-                            
+
                             <div className="form-group">
                                 <label htmlFor="engagement">Engagement Rate (%)</label>
-                                <input 
-                                    type="text" 
-                                    id="engagement" 
+                                <input
+                                    type="text"
+                                    id="engagement"
                                     name="engagement"
                                     placeholder="e.g., 3.5"
                                     value={formData.engagement}
@@ -570,12 +627,12 @@ const Sell = () => {
                                 {errors.engagement && <span className="error-message">{errors.engagement}</span>}
                             </div>
                         </div>
-                        
+
                         <div className="form-group">
                             <label htmlFor="revenue">Monthly Revenue ($)</label>
-                            <input 
-                                type="text" 
-                                id="revenue" 
+                            <input
+                                type="text"
+                                id="revenue"
                                 name="revenue"
                                 placeholder="e.g., 500"
                                 value={formData.revenue}
@@ -584,12 +641,12 @@ const Sell = () => {
                             />
                             {errors.revenue && <span className="error-message">{errors.revenue}</span>}
                         </div>
-                        
+
                         <div className="form-group">
                             <label htmlFor="accountDescription">Description *</label>
-                            <textarea 
-                                id="accountDescription" 
-                                name="accountDescription" 
+                            <textarea
+                                id="accountDescription"
+                                name="accountDescription"
                                 rows="4"
                                 placeholder="Describe your account, its niche, content, and any other relevant details"
                                 value={formData.accountDescription}
@@ -599,18 +656,18 @@ const Sell = () => {
                             {errors.accountDescription && <span className="error-message">{errors.accountDescription}</span>}
                         </div>
                     </div>
-                    
+
                     {(formData.transactionType.sell || formData.transactionType.valuation) && (
                         <div className="form-section">
                             <h3>{formData.transactionType.sell ? 'Pricing' : 'Valuation'} Information</h3>
-                            
+
                             <div className="form-group">
                                 <label htmlFor="accountPrice">{formData.transactionType.sell ? 'Asking Price ($) *' : 'Desired Valuation ($)'}</label>
-                                <input 
-                                    type="number" 
-                                    id="accountPrice" 
-                                    name="accountPrice" 
-                                    min="0" 
+                                <input
+                                    type="number"
+                                    id="accountPrice"
+                                    name="accountPrice"
+                                    min="0"
                                     step="0.01"
                                     value={formData.accountPrice}
                                     onChange={handleChange}
@@ -619,7 +676,7 @@ const Sell = () => {
                                 />
                                 {errors.accountPrice && <span className="error-message">{errors.accountPrice}</span>}
                             </div>
-                            
+
                             {formData.transactionType.sell && (
                                 <div className="form-group">
                                     <label htmlFor="preferredPayment">Preferred Payment Method</label>
@@ -639,16 +696,16 @@ const Sell = () => {
                             )}
                         </div>
                     )}
-                    
+
                     {formData.transactionType.exchange && (
                         <div className="form-section">
                             <h3>Exchange Details</h3>
-                            
+
                             <div className="form-group">
                                 <label htmlFor="exchangeRequirements">What are you looking for in exchange? *</label>
-                                <textarea 
-                                    id="exchangeRequirements" 
-                                    name="exchangeRequirements" 
+                                <textarea
+                                    id="exchangeRequirements"
+                                    name="exchangeRequirements"
                                     rows="3"
                                     placeholder="Describe what type of account you'd like to exchange for"
                                     value={formData.exchangeRequirements}
@@ -659,15 +716,15 @@ const Sell = () => {
                             </div>
                         </div>
                     )}
-                    
+
                     <div className="form-section">
                         <h3>Contact Information</h3>
-                        
+
                         <div className="form-group">
                             <label htmlFor="contactEmail">Contact Email *</label>
-                            <input 
-                                type="email" 
-                                id="contactEmail" 
+                            <input
+                                type="email"
+                                id="contactEmail"
                                 name="contactEmail"
                                 value={formData.contactEmail}
                                 onChange={handleChange}
@@ -675,12 +732,12 @@ const Sell = () => {
                             />
                             {errors.contactEmail && <span className="error-message">{errors.contactEmail}</span>}
                         </div>
-                        
+
                         <div className="form-group">
                             <label htmlFor="phoneNumber">Phone Number (optional)</label>
-                            <input 
-                                type="tel" 
-                                id="phoneNumber" 
+                            <input
+                                type="tel"
+                                id="phoneNumber"
                                 name="phoneNumber"
                                 placeholder="+1 (123) 456-7890"
                                 value={formData.phoneNumber}
@@ -690,11 +747,11 @@ const Sell = () => {
                             {errors.phoneNumber && <span className="error-message">{errors.phoneNumber}</span>}
                         </div>
                     </div>
-                    
+
                     <div className="form-group checkbox-group">
-                        <input 
-                            type="checkbox" 
-                            id="termsAgree" 
+                        <input
+                            type="checkbox"
+                            id="termsAgree"
                             name="termsAgree"
                             checked={formData.termsAgree}
                             onChange={handleChange}
@@ -703,22 +760,21 @@ const Sell = () => {
                         <label htmlFor="termsAgree">I agree to the Terms and Conditions *</label>
                         {errors.termsAgree && <span className="error-message">{errors.termsAgree}</span>}
                     </div>
-                    
-                    <button 
-                        type="submit" 
+
+                    <button
+                        type="submit"
                         className={getSubmitButtonClass()}
                         disabled={!isAnyTransactionSelected()}
                     >
                         {formData.transactionType.sell && !formData.transactionType.valuation && !formData.transactionType.exchange && 'List For Sale'}
                         {!formData.transactionType.sell && formData.transactionType.valuation && !formData.transactionType.exchange && 'Request Valuation'}
                         {!formData.transactionType.sell && !formData.transactionType.valuation && formData.transactionType.exchange && 'Post Exchange Offer'}
-                        {((formData.transactionType.sell && formData.transactionType.valuation) || 
-                          (formData.transactionType.sell && formData.transactionType.exchange) || 
-                          (formData.transactionType.valuation && formData.transactionType.exchange) ||
-                          (formData.transactionType.sell && formData.transactionType.valuation && formData.transactionType.exchange)) && 'Submit Listing'}
+                        {((formData.transactionType.sell && formData.transactionType.valuation) ||
+                            (formData.transactionType.sell && formData.transactionType.exchange) ||
+                            (formData.transactionType.valuation && formData.transactionType.exchange) ||
+                            (formData.transactionType.sell && formData.transactionType.valuation && formData.transactionType.exchange)) && 'Submit Listing'}
                     </button>
                 </form>
-                
                 {submitted && (
                     <div className="success-message">
                         Thank you for your submission! Your listing will be reviewed shortly.

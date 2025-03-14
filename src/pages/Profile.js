@@ -8,6 +8,7 @@ const Profile = () => {
     const [selectedListing, setSelectedListing] = useState(null);
     const [selectedNotification, setSelectedNotification] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [listing, setListing] = useState([]);
 
     const mockListings = [
         {
@@ -38,6 +39,19 @@ const Profile = () => {
 
     const [notification, setNotification] = useState([]);
 
+    const fetchListing = async () => {
+        try {
+            const id = localStorage.getItem('id');
+            if (id) {
+                const response = await fetch(`${BaseUrl}/listing/${id}`);
+                const json = await response.json();
+                setListing(json);
+            }
+        } catch (e) {
+            console.log('error fetching...', e);
+        }
+    };
+
     const fetchNotification = async () => {
         try {
             const id = localStorage.getItem('id');
@@ -65,6 +79,7 @@ const Profile = () => {
     };
 
     useEffect(() => {
+        fetchListing();
         fetchProfile();
         fetchNotification();
     }, []);
@@ -100,24 +115,24 @@ const Profile = () => {
 
     const updateNotification = async (notificationId) => {
         try {
-          const response = await fetch(`${BaseUrl}/notifications/${notificationId}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ seen: true })
-          });
-      
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-      
-          const data = await response.json();
-          fetchNotification();
+            const response = await fetch(`${BaseUrl}/notifications/${notificationId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ seen: true })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            fetchNotification();
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
-      };
+    };
 
     const backToNotifications = () => setSelectedNotification(null);
 
@@ -164,12 +179,12 @@ const Profile = () => {
                     <button onClick={handleMyListings} className="profile-btn action-btn">
                         <span className="action-icon">📋</span>
                         My Listings
-                        <span className="count-badge">{mockListings.length}</span>
+                        <span className="count-badge">{listing.length}</span>
                     </button>
                     <button onClick={handleNotifications} className="profile-btn action-btn">
                         <span className="action-icon">🔔</span>
                         Notifications
-                        {notification.filter(n => !n.read).length > 0 && (
+                        {notification.filter(n => !n.seen).length > 0 && (
                             <span className="count-badge">{notification.filter(n => !n.read).length}</span>
                         )}
                     </button>
@@ -263,18 +278,18 @@ const Profile = () => {
                 </button>
             </div>
             <div className="mock-items-container">
-                {mockListings.map(item => (
+                {listing.map(item => (
                     <div
-                        key={item.id}
+                        key={item._id}
                         className="mock-listing-item"
                         onClick={() => showListingDetails(item)}
                     >
                         <div className="mock-item-image">
-                            <img src={item.image} alt={item.title} />
+                            <img src={item.uploadImage} alt={item.accountName} />
                         </div>
                         <div className="mock-item-details">
-                            <h3 className="mock-item-title">{item.title}</h3>
-                            <p className="mock-item-price">{item.price}</p>
+                            <h3 className="mock-item-title">{item.accountName}</h3>
+                            <p className="mock-item-price">$ {item.accountPrice}</p>
                         </div>
                         <div className="mock-item-status">
                             <span className={`status-badge ${item.status.toLowerCase()}`}>
@@ -298,24 +313,22 @@ const Profile = () => {
             <div className="listing-detail-container">
                 <div className="listing-detail-header">
                     <div className="listing-detail-image">
-                        <img src={selectedListing.image} alt={selectedListing.title} />
+                        <img src={selectedListing.uploadImage} alt={selectedListing.accountName} />
                     </div>
                     <div className="listing-detail-title-section">
-                        <h2 className="listing-detail-title">{selectedListing.title}</h2>
+                        <h2 className="listing-detail-title">{selectedListing.accountName}</h2>
                         <div className="listing-detail-price-status">
-                            <span className="listing-detail-price">{selectedListing.price}</span>
+                            <span className="listing-detail-price">$ {selectedListing.accountPrice}</span>
                             <span className={`status-badge ${selectedListing.status.toLowerCase()}`}>
                                 {selectedListing.status}
                             </span>
                         </div>
                     </div>
                 </div>
-
                 <div className="listing-detail-section">
                     <h3 className="section-subtitle">Description</h3>
-                    <p className="listing-detail-description">{selectedListing.description}</p>
+                    <p className="listing-detail-description">{selectedListing.accountDescription}</p>
                 </div>
-
                 <div className="listing-detail-actions">
                     <button className="profile-btn secondary-btn">Edit Listing</button>
                     <button className="profile-btn primary-btn">View Offers</button>
