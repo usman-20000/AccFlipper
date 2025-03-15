@@ -18,6 +18,8 @@ import { initializeCounters } from './utils/animations';
 import './App.css';
 import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
+import EditSell from './pages/EditSell';
+import AdminDashboard from './Admin/Dashboard';
 
 // Try to import AOS, but don't break if it's not installed
 let AOS;
@@ -120,6 +122,8 @@ function App() {
                   <Route element={<PrivateRoute />}>
                     <Route path="/Profile" element={<Profile />} />
                     <Route path="/sell" element={<Sell />} />
+                    <Route path="/editsell/:id" element={<EditSell />} />
+                    <Route path="/dashboard" element={<AdminDashboard/>} />
                   </Route>
                 </Routes>
               </main>

@@ -330,8 +330,8 @@ const Profile = () => {
                     <p className="listing-detail-description">{selectedListing.accountDescription}</p>
                 </div>
                 <div className="listing-detail-actions">
-                    <button className="profile-btn secondary-btn">Edit Listing</button>
-                    <button className="profile-btn primary-btn">View Offers</button>
+                    <a href={`/editsell/${selectedListing._id}`} className="profile-btn secondary-btn">Edit Listing</a>
+                    {/* <button className="profile-btn primary-btn">View Offers</button> */}
                 </div>
             </div>
         </div>
