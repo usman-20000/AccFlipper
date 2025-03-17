@@ -9,8 +9,9 @@ const UserManagement = ({ initialFilter = 'all' }) => {
     { id: 4, name: 'Anna Brown', email: 'anna@example.com', role: 'Buyer', status: 'Banned', joinDate: '2023-04-15' },
     { id: 5, name: 'Tom Wilson', email: 'tom@example.com', role: 'Seller', status: 'Active', joinDate: '2023-06-22' },
   ]);
-  
+
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedListing, setSelectedListing] = useState([]);
   const [showUserModal, setShowUserModal] = useState(false);
   const [filterStatus, setFilterStatus] = useState(initialFilter);
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,33 +26,70 @@ const UserManagement = ({ initialFilter = 'all' }) => {
     if (filterStatus !== 'all' && user.status.toLowerCase() !== filterStatus) {
       return false;
     }
-    
+
     // Filter by search query
-    if (searchQuery && !user.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !user.email.toLowerCase().includes(searchQuery.toLowerCase())) {
+    if (searchQuery && !user.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !user.email.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-    
+
     return true;
   });
 
-  const handleViewUser = (user) => {
+  const handleViewUser = async (user) => {
     setSelectedUser(user);
     setShowUserModal(true);
+
+    const response = await fetch(`${BaseUrl}/listing`);
+    if (!response.ok) {
+      console.error('Failed to fetch user listings');
+    }
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Listings:', data);
+      const userListing = data.filter(listing => listing.userId === user._id);
+      setSelectedListing(userListing);
+    }
   };
 
-  const handleStatusChange = (userId, newStatus) => {
-    const updatedUsers = users.map(user => 
+  const handleStatusChange = async (userId, newStatus) => {
+    const updatedUsers = users.map(user =>
       user._id === userId ? { ...user, status: newStatus } : user
     );
+
+    const response = await fetch(`${BaseUrl}/register/${userId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    if (!response.ok) {
+      console.error('Failed to update user status');
+      alert('Failed to update user status');
+    }
+
     setUsers(updatedUsers);
   };
 
-  const handleDeleteUser = (userId) => {
+  const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       const updatedUsers = users.filter(user => user._id !== userId);
       setUsers(updatedUsers);
     }
+
+    const response = await fetch(`${BaseUrl}/register/${userId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      console.error('Failed to delete user');
+      alert('Failed to delete user');
+    };
+    if (selectedUser) {
+      setSelectedUser(null);
+      setShowUserModal(false);
+    }
+
   };
 
 
@@ -71,12 +109,15 @@ const UserManagement = ({ initialFilter = 'all' }) => {
 
   useEffect(() => {
     fetchUsers();
-  } , []);
+  }, []);
+
+
+
 
   return (
     <div className="user-management">
       <h2>User Management {filterStatus !== 'all' ? `- ${filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)} Users` : ''}</h2>
-      
+
       <div className="admin-filters">
         <div className="admin-search">
           <input
@@ -86,10 +127,10 @@ const UserManagement = ({ initialFilter = 'all' }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        
+
         <div className="admin-filter-group">
-          <select 
-            className="admin-filter-select" 
+          <select
+            className="admin-filter-select"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
@@ -98,13 +139,13 @@ const UserManagement = ({ initialFilter = 'all' }) => {
             <option value="pending">Pending</option>
             <option value="banned">Banned</option>
           </select>
-          
+
           <button className="admin-btn admin-btn-primary">
             Add New User
           </button>
         </div>
       </div>
-      
+
       <table className="admin-table">
         <thead>
           <tr>
@@ -130,35 +171,35 @@ const UserManagement = ({ initialFilter = 'all' }) => {
               <td>{user.timestamp && timeAgo(user?.timestamp)}</td>
               <td>
                 <div className="admin-table-actions">
-                  <button 
+                  <button
                     className="admin-table-btn admin-table-btn-view"
                     onClick={() => handleViewUser(user)}
                   >
                     View
                   </button>
                   {user.status === 'Active' ? (
-                    <button 
+                    <button
                       className="admin-table-btn admin-table-btn-delete"
                       onClick={() => handleStatusChange(user._id, 'Banned')}
                     >
                       Ban
                     </button>
                   ) : user.status === 'Banned' ? (
-                    <button 
+                    <button
                       className="admin-table-btn admin-table-btn-edit"
                       onClick={() => handleStatusChange(user._id, 'Active')}
                     >
                       Unban
                     </button>
                   ) : (
-                    <button 
+                    <button
                       className="admin-table-btn admin-table-btn-edit"
                       onClick={() => handleStatusChange(user._id, 'Active')}
                     >
                       Approve
                     </button>
                   )}
-                  <button 
+                  <button
                     className="admin-table-btn admin-table-btn-delete"
                     onClick={() => handleDeleteUser(user._id)}
                   >
@@ -170,7 +211,7 @@ const UserManagement = ({ initialFilter = 'all' }) => {
           ))}
         </tbody>
       </table>
-      
+
       {showUserModal && selectedUser && (
         <div className="admin-modal-backdrop" onClick={() => setShowUserModal(false)}>
           <div className="admin-modal" onClick={e => e.stopPropagation()}>
@@ -183,12 +224,10 @@ const UserManagement = ({ initialFilter = 'all' }) => {
                 <div className="user-detail-section">
                   <h4>Account Information</h4>
                   <p><strong>Email:</strong> {selectedUser.email}</p>
-                  <p><strong>Role:</strong> {selectedUser.role}</p>
                   <p><strong>Status:</strong> {selectedUser.status}</p>
-                  <p><strong>Join Date:</strong> {selectedUser.createdAt}</p>
-                  <p><strong>Last Login:</strong> 2023-07-28 14:35</p>
+                  <p><strong>Join Date:</strong> {selectedUser.timestamp && timeAgo(selectedUser.timestamp)}</p>
                 </div>
-                
+
                 <div className="user-detail-section">
                   <h4>User Listings</h4>
                   <table className="admin-table">
@@ -200,34 +239,27 @@ const UserManagement = ({ initialFilter = 'all' }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Netflix Premium Account</td>
-                        <td>$19.99</td>
+                    {selectedListing?.map((item) => (<tr>
+                        <td>{item.accountName}</td>
+                        <td>{item.accountPrice}</td>
                         <td>
-                          <span className="status-badge status-active">Active</span>
+                          <span className="status-badge status-active">{item.status}</span>
                         </td>
-                      </tr>
-                      <tr>
-                        <td>Spotify Family Plan</td>
-                        <td>$14.99</td>
-                        <td>
-                          <span className="status-badge status-sold">Sold</span>
-                        </td>
-                      </tr>
+                      </tr>))}
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button 
+              <button
                 className="admin-btn admin-btn-secondary"
                 onClick={() => setShowUserModal(false)}
               >
                 Close
               </button>
               {selectedUser.status === 'Active' ? (
-                <button 
+                <button
                   className="admin-btn admin-btn-danger"
                   onClick={() => {
                     handleStatusChange(selectedUser._id, 'Banned');
@@ -237,7 +269,7 @@ const UserManagement = ({ initialFilter = 'all' }) => {
                   Ban User
                 </button>
               ) : selectedUser.status === 'Banned' ? (
-                <button 
+                <button
                   className="admin-btn admin-btn-primary"
                   onClick={() => {
                     handleStatusChange(selectedUser._id, 'Active');
@@ -247,7 +279,7 @@ const UserManagement = ({ initialFilter = 'all' }) => {
                   Unban User
                 </button>
               ) : (
-                <button 
+                <button
                   className="admin-btn admin-btn-primary"
                   onClick={() => {
                     handleStatusChange(selectedUser._id, 'Active');

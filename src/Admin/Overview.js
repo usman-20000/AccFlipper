@@ -175,8 +175,8 @@ const Overview = ({ stats }) => {
         ))}
       </div>
       
-      <h3>Recent Activity</h3>
-      <table className="admin-table">
+      {/* <h3>Recent Activity</h3> */}
+      {/* <table className="admin-table">
         <thead>
           <tr>
             <th>Activity</th>
@@ -204,7 +204,7 @@ const Overview = ({ stats }) => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> */}
 
       {/* Activity Detail Modal */}
       {showActivityModal && selectedActivity && (

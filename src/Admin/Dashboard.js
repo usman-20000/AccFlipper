@@ -118,10 +118,10 @@ const AdminDashboard = () => {
       const listingData = await listingResponse.json();
       const soldListings = listingData.filter(listing => listing.status === 'sold');
       const valuationReq = listingData.filter(valuation => valuation.transactionType.valuation === true);
-      const approvedUser = data.filter(user => user.status === 'approved');
-      const pendingUsers = data.filter(user => user.status === 'pending');
-      const bannedUsers = data.filter(user => user.status === 'banned');
-      console.log('Users:', data.length); 
+      const approvedUser = data.filter(user => user.status.toLowerCase() === 'active');
+      const pendingUsers = data.filter(user => user.status.toLowerCase() === 'pending');
+      const bannedUsers = data.filter(user => user.status.toLowerCase() === 'banned');
+      console.log('Users:', data.length);
       console.log('Listings:', listingData.length);
       setStats({
         ...stats,
@@ -140,7 +140,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchUsers();
-  } , []);
+  }, []);
 
   return (
     <div className="admin-panel">

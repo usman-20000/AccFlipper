@@ -1,10 +1,10 @@
-export const BaseUrl = "https://yt-sale-api.vercel.app";
 
+export const BaseUrl = "https://yt-sale-api.vercel.app";
 
 export const timeAgo = (date1) => {
     const date = new Date(date1);
     const currentTime = new Date();
-    const timeDiff = currentTime - date;
+    const timeDiff = currentTime.getTime() - date.getTime();
 
     const seconds = Math.floor(timeDiff / 1000);
     const minutes = Math.floor(seconds / 60);
