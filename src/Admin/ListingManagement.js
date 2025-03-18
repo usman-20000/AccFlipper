@@ -40,10 +40,27 @@ const ListingManagement = ({ initialFilter = 'all' }) => {
     setShowListingModal(true);
   };
 
-  const handleStatusChange = (listingId, newStatus) => {
+  const handleStatusChange = async (listingId, newStatus) => {
     const updatedListings = listings.map(listing =>
-      listing.id === listingId ? { ...listing, status: newStatus } : listing
+      listing._id === listingId ? { ...listing, status: newStatus } : listing
     );
+
+    const response = await fetch(`${BaseUrl}/listing/${listingId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        status: newStatus
+      }),
+    });
+
+    if (!response.ok) {
+      console.log('error updating status');
+      alert('error updating status');
+      return;
+    }
+
     setListings(updatedListings);
   };
 
@@ -51,7 +68,7 @@ const ListingManagement = ({ initialFilter = 'all' }) => {
     if (window.confirm('Are you sure you want to delete this listing? This action cannot be undone.')) {
       const updatedListings = listings.filter(listing => listing._id !== listingId);
       setListings(updatedListings);
-     const response = await fetch(`${BaseUrl}/listing/${listingId}`, {
+      const response = await fetch(`${BaseUrl}/listing/${listingId}`, {
         method: 'DELETE',
       })
         .then(response => response.json())
@@ -84,6 +101,8 @@ const ListingManagement = ({ initialFilter = 'all' }) => {
   useEffect(() => {
     fetchListing();
   }, []);
+
+
 
   return (
     <div className="listing-management">
@@ -158,18 +177,18 @@ const ListingManagement = ({ initialFilter = 'all' }) => {
                   >
                     View
                   </button>
-                  {listing.status === 'Pending' && (
+                  {listing.status.toLowerCase() === 'pending' && (
                     <button
                       className="admin-table-btn admin-table-btn-edit"
-                      onClick={() => handleStatusChange(listing.id, 'Active')}
+                      onClick={() => handleStatusChange(listing._id, 'active')}
                     >
                       Approve
                     </button>
                   )}
-                  {(listing.status === 'Active' || listing.status === 'Pending') && (
+                  {(listing.status.toLowerCase() === 'active' || listing.status.toLowerCase() === 'pending') && (
                     <button
                       className="admin-table-btn admin-table-btn-edit"
-                      onClick={() => handleStatusChange(listing.id, 'Sold')}
+                      onClick={() => handleStatusChange(listing._id, 'Sold')}
                     >
                       Mark Sold
                     </button>
@@ -212,7 +231,7 @@ const ListingManagement = ({ initialFilter = 'all' }) => {
                       : 'Full version software with all features unlocked. License is transferable and valid for 1 year.'}
                   </p>
 
-                  {selectedListing.status === 'Valuation' && (
+                  {selectedListing.status.toLowerCase() === 'valuation' && (
                     <div className="valuation-section">
                       <h4>Valuation Request</h4>
                       <div className="valuation-form">
@@ -236,11 +255,11 @@ const ListingManagement = ({ initialFilter = 'all' }) => {
                 <div className="listing-admin-actions">
                   <h4>Admin Actions</h4>
                   <div className="admin-action-buttons">
-                    {selectedListing.status === 'Pending' && (
+                    {selectedListing.status.toLowerCase() === 'pending' && (
                       <button
                         className="admin-btn admin-btn-primary"
                         onClick={() => {
-                          handleStatusChange(selectedListing.id, 'Active');
+                          handleStatusChange(selectedListing._id, 'Active');
                           setShowListingModal(false);
                         }}
                       >
@@ -248,11 +267,11 @@ const ListingManagement = ({ initialFilter = 'all' }) => {
                       </button>
                     )}
 
-                    {(selectedListing.status === 'Active' || selectedListing.status === 'Pending') && (
+                    {(selectedListing.status.toLowerCase() === 'active' || selectedListing.status.toLowerCase() === 'pending') && (
                       <button
                         className="admin-btn admin-btn-primary"
                         onClick={() => {
-                          handleStatusChange(selectedListing.id, 'Sold');
+                          handleStatusChange(selectedListing._id, 'Sold');
                           setShowListingModal(false);
                         }}
                       >
