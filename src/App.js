@@ -20,6 +20,7 @@ import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
 import EditSell from './pages/EditSell';
 import AdminDashboard from './Admin/Dashboard';
+import UserChat from './pages/UserChat';
 
 // Try to import AOS, but don't break if it's not installed
 let AOS;
@@ -124,6 +125,7 @@ function App() {
                     <Route path="/sell" element={<Sell />} />
                     <Route path="/editsell/:id" element={<EditSell />} />
                     <Route path="/dashboard" element={<AdminDashboard/>} />
+                    <Route path="/chat" element={<UserChat/>} />
                   </Route>
                 </Routes>
               </main>
