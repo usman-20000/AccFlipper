@@ -57,6 +57,7 @@ function Login() {
                 console.log('response:', data.data);
                 if (!isSignup) {
                     localStorage.setItem('id', data.data.id);
+                    localStorage.setItem('name', data.data.name);
                     navigate('/Home');
                 } else {
                     setIsSignup(false);

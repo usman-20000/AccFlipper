@@ -238,9 +238,9 @@ const Buy = () => {
                       </button>
                     )}
 
-                    <button className="admin-btn admin-btn-secondary">
+                    <a href={`/chat/${selectedListing.userId}`} className="admin-btn admin-btn-secondary">
                       Message Seller
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>

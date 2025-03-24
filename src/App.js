@@ -124,8 +124,9 @@ function App() {
                     <Route path="/Profile" element={<Profile />} />
                     <Route path="/sell" element={<Sell />} />
                     <Route path="/editsell/:id" element={<EditSell />} />
-                    <Route path="/dashboard" element={<AdminDashboard/>} />
-                    <Route path="/chat" element={<UserChat/>} />
+                    <Route path="/dashboard" element={<AdminDashboard />} />
+                    <Route path="/chat" element={<UserChat />} />
+                    <Route path="/chat/:recId" element={<UserChat />} />
                   </Route>
                 </Routes>
               </main>
