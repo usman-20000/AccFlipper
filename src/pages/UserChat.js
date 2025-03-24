@@ -37,6 +37,7 @@ const UserChat = () => {
   useEffect(() => {
     if (recId) {
       const userId = localStorage.getItem('id');
+      fetchChat(recId);
       if (userId && recId) {
         socket.emit('join_room', { senderId: userId, receiverId: recId });
       }
