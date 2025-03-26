@@ -30,3 +30,14 @@ export const timeAgo = (date1) => {
         return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
     }
 }
+
+
+export const fetchUser = async (id) => {
+    try {
+        const response = await fetch(`${BaseUrl}/register/${id}`);
+        const json = await response.json();
+        return json;
+    } catch (e) {
+        console.log('error fetching user...', e);
+    }
+}

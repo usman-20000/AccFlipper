@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { BaseUrl, timeAgo } from '../utils/data';
+import { BaseUrl, fetchUser, timeAgo } from '../utils/data';
 import { io } from 'socket.io-client';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 
 const UserChat = () => {
 
-  const socket = io(BaseUrl);
   const { recId } = useParams();
+  const navigate = useNavigate();
 
   const [activeConversation, setActiveConversation] = useState(null);
   const [conversations, setConversations] = useState([]);
@@ -16,6 +16,7 @@ const UserChat = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [userNotes, setUserNotes] = useState('');
   const [userProfile, setUserProfile] = useState(null);
+  const [socket, setSocket] = useState(null);
   const [id, setId] = useState('');
 
   const messagesEndRef = useRef(null);
@@ -33,26 +34,68 @@ const UserChat = () => {
     scrollToBottom();
   }, [activeConversation, conversations, scrollToBottom]);
 
-  // Join the chat room and listen for messages
   useEffect(() => {
     if (recId) {
-      const userId = localStorage.getItem('id');
+      const myId = localStorage.getItem('id');
       fetchChat(recId);
-      if (userId && recId) {
-        socket.emit('join_room', { senderId: userId, receiverId: recId });
-      }
+      console.log('id:', myId, recId);
 
-      const handleReceiveMessage = (data) => {
-        setConversations((prevMessages) => [...prevMessages, data]);
+      const ws = new WebSocket("https://yt-realtime-production.up.railway.app");
+
+      ws.onopen = () => {
+        console.log("Connected to WebSocket server");
+
+        // Join chat room
+        const joinRoomData = {
+          type: "join_room",
+          senderId: myId,
+          receiverId: recId,
+        };
+        ws.send(JSON.stringify(joinRoomData));
       };
 
-      socket.on('receive_message', handleReceiveMessage);
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "receive_message") {
+          setActiveConversation((prevMessages) => [...prevMessages, data.message]);
+        }
+      };
+
+      ws.onclose = () => {
+        console.log("WebSocket disconnected");
+      };
+
+      setSocket(ws);
 
       return () => {
-        socket.off('receive_message', handleReceiveMessage);
+        ws.close();
       };
     }
   }, [recId]);
+
+  // useEffect(() => {
+  //   if (recId) {
+  //     const userId = localStorage.getItem('id');
+  //     fetchChat(recId);
+
+  //     if (userId && recId) {
+  //       console.log(`Emitting join_room with senderId: ${userId}, receiverId: ${recId}`);
+  //       socket.emit('join_room', { senderId: userId, receiverId: recId });
+  //     }
+
+  //     const handleReceiveMessage = (data) => {
+  //       setActiveConversation((prevMessages) => [...prevMessages, data]);
+  //     };
+
+  //     socket.on('receive_message', handleReceiveMessage);
+
+  //     return () => {
+  //       socket.off('receive_message', handleReceiveMessage);
+  //     };
+  //   }
+  // }, [recId]);
+
 
   // Fetch the list of conversations
   const fetchChatList = useCallback(async () => {
@@ -66,10 +109,10 @@ const UserChat = () => {
     }
   }, []);
 
-  // Fetch a single chat
   const fetchChat = useCallback(async (senderId) => {
     try {
       const userId = localStorage.getItem('id');
+
       const response = await fetch(`${BaseUrl}/singlechat/${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -77,6 +120,7 @@ const UserChat = () => {
       });
       const json = await response.json();
       setActiveConversation(json);
+
     } catch (error) {
       console.error('Error fetching chat:', error);
     }
@@ -97,11 +141,15 @@ const UserChat = () => {
         ? activeConversation[0]?.senderId
         : activeConversation[0]?.receiverId;
 
+        
+      const receiver = await fetchUser(receiverId);
+      const receiverName = await receiver.name;
+
     const newMessageData = {
       senderId: userId,
       receiverId: recId ? recId : receiverId,
       senderName: name || 'unknown',
-      receiverName: activeConversation[0]?.receiverName || 'unknown',
+      receiverName: receiverName || 'unknown',
       text: newMessage,
       time: new Date().toISOString(),
     };
@@ -113,13 +161,54 @@ const UserChat = () => {
         body: JSON.stringify(newMessageData),
       });
 
-      socket.emit('send_message', newMessageData);
-      setActiveConversation((prevMessages) => [...prevMessages, newMessageData]);
+      const newMessageData2 = {
+        senderId: userId,
+        receiverId: recId ? recId : receiverId,
+
+        message: newMessage,
+        time: new Date().toISOString(),
+      };
+
+      console.log('newMessageData2:', newMessageData2);
+      // setActiveConversation((prevMessages) => [...prevMessages, newMessageData]);
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
     }
   };
+
+  const sendMessage = async () => {
+    const myId = localStorage.getItem('id');
+    const name = localStorage.getItem('name');
+
+    if (socket && newMessage.trim() !== "") {
+
+      const receiverId =
+        activeConversation[0]?.receiverId === myId
+          ? activeConversation[0]?.senderId
+          : activeConversation[0]?.receiverId;
+
+      const receiver = await fetchUser(receiverId);
+      const receiverName = await receiver.name;
+
+      const messageData = {
+        type: "send_message",
+        senderId: myId,
+        receiverId: recId ? recId : receiverId,
+        senderName: name,
+        receiverName: receiverName,
+        message: newMessage,
+      };
+
+      console.log('messageData:', messageData);
+
+      socket.send(JSON.stringify(messageData));
+      handleSendMessage();
+      setNewMessage(""); // Clear input
+      fetchChatList();
+    }
+  };
+
 
   // Handle selecting a conversation
   const handleSelectConversation = (conversation) => {
@@ -130,8 +219,10 @@ const UserChat = () => {
 
     const uid = localStorage.getItem('id');
     if (conversation.receiverId === uid) {
+      navigate(`/chat/${conversation.senderId}`);
       fetchChat(conversation.senderId);
     } else {
+      navigate(`/chat/${recId ? recId : conversation.receiverId}`);
       fetchChat(recId ? recId : conversation.receiverId);
     }
   };
@@ -245,14 +336,15 @@ const UserChat = () => {
                   onKeyPress={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
-                      handleSendMessage();
+                      // handleSendMessage();
+                      sendMessage();
                     }
                   }}
                   className="chat-input-field"
                 ></textarea>
                 <button
                   className="chat-send-btn"
-                  onClick={handleSendMessage}
+                  onClick={sendMessage}
                   disabled={!newMessage.trim()}
                 >
                   Send

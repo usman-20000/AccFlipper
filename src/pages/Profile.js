@@ -184,7 +184,7 @@ const Profile = () => {
                     <button onClick={handleNotifications} className="profile-btn action-btn">
                         <span className="action-icon">🔔</span>
                         Notifications
-                        {notification.filter(n => !n.seen).length > 0 && (
+                        {notification?.filter(n => !n.seen).length > 0 && (
                             <span className="count-badge">{notification.filter(n => !n.read).length}</span>
                         )}
                     </button>
@@ -346,7 +346,7 @@ const Profile = () => {
                 </button>
             </div>
             <div className="mock-items-container">
-                {notification.map(item => (
+                {notification?.map(item => (
                     <div
                         key={item._id}
                         className={`mock-notification-item ${item.seen ? '' : 'unread'}`}
