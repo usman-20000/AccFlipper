@@ -21,6 +21,7 @@ import PrivateRoute from './components/PrivateRoute';
 import EditSell from './pages/EditSell';
 import AdminDashboard from './Admin/Dashboard';
 import UserChat from './pages/UserChat';
+import { BaseUrl, updateOnline } from './utils/data';
 
 // Try to import AOS, but don't break if it's not installed
 let AOS;
@@ -38,6 +39,34 @@ try {
 function App() {
   const [loading, setLoading] = useState(true);
   const [contentLoaded, setContentLoaded] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('id');
+    const updateStatus = () => {
+      const onlineStatus = navigator.onLine;
+      setIsOnline(onlineStatus);
+      updateOnline(onlineStatus); // Update backend status
+    };
+
+    const handleTabClose = () => {
+      updateOnline(false);
+    };
+
+    window.addEventListener("online", updateStatus);
+    window.addEventListener("offline", updateStatus);
+    window.addEventListener("beforeunload", handleTabClose);
+
+    // Run once on mount to update the status immediately
+    updateStatus();
+
+    return () => {
+      window.removeEventListener("online", updateStatus);
+      window.removeEventListener("offline", updateStatus);
+      window.removeEventListener("beforeunload", handleTabClose);
+    };
+  }, []);
+
 
   const finishLoading = () => {
     setLoading(false);

@@ -41,3 +41,29 @@ export const fetchUser = async (id) => {
         console.log('error fetching user...', e);
     }
 }
+
+export const updateOnline = async (status) => {
+    try {
+        const id = localStorage.getItem('id');
+        const response = await fetch(`${BaseUrl}/register/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                online: status
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error: ${errorData.message || response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log('Update successful:', data);
+
+    } catch (e) {
+        console.log('error updating online status...', e);
+    }
+}
