@@ -42,6 +42,16 @@ export const fetchUser = async (id) => {
     }
 }
 
+export const fetchListing = async (id) => {
+    try {
+        const response = await fetch(`${BaseUrl}/singleListing/${id}`);
+        const json = await response.json();
+        return json;
+    } catch (e) {
+        console.log('error fetching user...', e);
+    }
+}
+
 export const updateOnline = async (status) => {
     try {
         const id = localStorage.getItem('id');

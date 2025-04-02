@@ -1,20 +1,18 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BaseUrl, fetchUser, timeAgo } from '../utils/data';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const UserChat = () => {
   const { recId } = useParams();
+  const navigate = useNavigate();
 
   const [activeConversation, setActiveConversation] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [showNotesModal, setShowNotesModal] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [userNotes, setUserNotes] = useState('');
-  const [userProfile, setUserProfile] = useState(null);
   const [receiverName, setReceiverName] = useState('');
   const [onlineStatus, setOnlineStatus] = useState('Offline');
   const [id, setId] = useState('');
+  const [sending, setSending] = useState(false); // Track sending state
 
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
@@ -26,6 +24,7 @@ const UserChat = () => {
     }
   }, []);
 
+  // Fetch user ID from localStorage and scroll to the bottom
   useEffect(() => {
     const userId = localStorage.getItem('id');
     setId(userId);
@@ -33,38 +32,62 @@ const UserChat = () => {
   }, [activeConversation, conversations, scrollToBottom]);
 
   // Initialize WebSocket and handle events
+  const handleWebSocketMessage = useCallback((event) => {
+    try {
+      const data = JSON.parse(event.data);
+      console.log('Received WebSocket message:', data);
+      if (data.type === 'receive_message') {
+        setActiveConversation((prevMessages) => [...prevMessages, data.message]);
+      }
+    } catch (error) {
+      console.error('Error parsing WebSocket message:', error);
+    }
+  }, [setActiveConversation]);
+
   useEffect(() => {
     if (recId) {
       const userId = localStorage.getItem('id');
       fetchChat(recId);
 
-      const ws = new WebSocket('https://yt-realtime-production.up.railway.app');
-      socketRef.current = ws;
+      const connectWebSocket = () => {
+        const ws = new WebSocket('https://yt-realtime-production.up.railway.app');
+        // const ws = new WebSocket('ws://localhost:4000'); // Update to match your server URL
+        socketRef.current = ws;
 
-      ws.onopen = () => {
-        console.log('Connected to WebSocket server');
-        ws.send(
-          JSON.stringify({
-            type: 'join_room',
-            senderId: userId,
-            receiverId: recId,
-          })
-        );
+        ws.onopen = () => {
+          console.log('WebSocket connected');
+          const roomId = [userId, recId].sort().join('_'); // Generate room ID
+          ws.send(
+            JSON.stringify({
+              type: 'join_room',
+              senderId: userId,
+              receiverId: recId,
+            })
+          );
+          console.log(`Joined room: ${roomId}`);
+        };       
+        
+        ws.onmessage = handleWebSocketMessage;
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+
+        ws.onclose = (event) => {
+          console.warn('WebSocket closed:', event.reason);
+          setTimeout(() => {
+            console.log('Reconnecting WebSocket...');
+            connectWebSocket();
+          }, 5000);
+        };
       };
 
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === 'receive_message') {
-          setActiveConversation((prevMessages) => [...prevMessages, data.message]);
-        }
-      };
-
-      ws.onclose = () => {
-        console.log('WebSocket disconnected');
-      };
+      connectWebSocket();
 
       return () => {
-        ws.close();
+        if (socketRef.current) {
+          socketRef.current.close();
+        }
       };
     }
   }, [recId]);
@@ -94,8 +117,8 @@ const UserChat = () => {
       setActiveConversation(json);
 
       const receiver = await fetchUser(senderId);
-      setReceiverName(receiver.name);
-      setOnlineStatus(receiver.online ? 'Online' : 'Offline');
+      setReceiverName(receiver?.name || 'Unknown');
+      setOnlineStatus(receiver?.online ? 'Online' : 'Offline');
     } catch (error) {
       console.error('Error fetching chat:', error);
     }
@@ -107,8 +130,9 @@ const UserChat = () => {
 
   // Handle sending a message
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !activeConversation) return;
+    if (!newMessage.trim() || !activeConversation.length || sending) return;
 
+    setSending(true); // Set sending state to true
     const userId = localStorage.getItem('id');
     const name = localStorage.getItem('name');
     const receiverId =
@@ -119,8 +143,8 @@ const UserChat = () => {
     const newMessageData = {
       senderId: userId,
       receiverId,
-      senderName: name || 'unknown',
-      receiverName: receiverName || 'unknown',
+      senderName: name || 'Unknown',
+      receiverName: receiverName || 'Unknown',
       text: newMessage,
       time: new Date().toISOString(),
     };
@@ -135,7 +159,11 @@ const UserChat = () => {
       socketRef.current?.send(
         JSON.stringify({
           type: 'send_message',
-          message: newMessageData,
+          senderId: userId,
+          receiverId,
+          senderName: name || 'Unknown',
+          receiverName: receiverName || 'Unknown',
+          message: newMessage,
         })
       );
 
@@ -143,6 +171,8 @@ const UserChat = () => {
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
+    } finally {
+      setSending(false); // Reset sending state
     }
   };
 
@@ -155,17 +185,12 @@ const UserChat = () => {
 
     const uid = localStorage.getItem('id');
     if (conversation.receiverId === uid) {
+      navigate(`/chat/${conversation.senderId}`);
       fetchChat(conversation.senderId);
     } else {
+      navigate(`/chat/${conversation.receiverId}`);
       fetchChat(conversation.receiverId);
     }
-  };
-
-  // Handle submitting notes
-  const handleNotesSubmit = (e) => {
-    e.preventDefault();
-    setShowNotesModal(false);
-    console.log('Notes saved:', userNotes);
   };
 
   return (
@@ -179,8 +204,9 @@ const UserChat = () => {
             {conversations.map((conversation) => (
               <div
                 key={conversation._id}
-                className={`chat-conversation-item ${activeConversation?._id === conversation._id ? 'active' : ''
-                  } ${conversation?.unread ? 'unread' : ''}`}
+                className={`chat-conversation-item ${
+                  activeConversation?._id === conversation._id ? 'active' : ''
+                } ${conversation?.unread ? 'unread' : ''}`}
                 onClick={() => handleSelectConversation(conversation)}
               >
                 <div className="chat-user-avatar">
@@ -215,10 +241,7 @@ const UserChat = () => {
               <div className="chat-header">
                 <div className="chat-header-user">
                   <div className="chat-user-avatar larger">
-                    {receiverName.charAt(0)}
-                    {/* {activeConversation[0]?.receiverId === id
-                      ? activeConversation[0]?.senderName?.charAt(0)
-                      : activeConversation[0]?.receiverName?.charAt(0)} */}
+                    {receiverName?.charAt(0)}
                   </div>
                   <div className="chat-user-info">
                     <h3 className="chat-active-user">{receiverName}</h3>
@@ -231,8 +254,9 @@ const UserChat = () => {
                 {activeConversation.map((message, index) => (
                   <div
                     key={index}
-                    className={`chat-message ${message.senderId === id ? 'outgoing' : 'incoming'
-                      }`}
+                    className={`chat-message ${
+                      message.senderId === id ? 'outgoing' : 'incoming'
+                    }`}
                   >
                     <div className="chat-message-content">
                       <p>{message.text}</p>
@@ -261,9 +285,9 @@ const UserChat = () => {
                 <button
                   className="chat-send-btn"
                   onClick={handleSendMessage}
-                  disabled={!newMessage.trim()}
+                  disabled={!newMessage.trim() || sending} // Disable button while sending
                 >
-                  Send
+                  {sending ? 'Sending...' : 'Send'}
                 </button>
               </div>
             </>
