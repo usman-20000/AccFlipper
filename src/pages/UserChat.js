@@ -35,6 +35,7 @@ const UserChat = () => {
   const handleWebSocketMessage = useCallback((event) => {
     try {
       const data = JSON.parse(event.data);
+      
       console.log('Received WebSocket message:', data);
       if (data.type === 'receive_message') {
         setActiveConversation((prevMessages) => [...prevMessages, data.message]);
@@ -238,7 +239,7 @@ const UserChat = () => {
         </div>
 
         <div className="chat-main">
-          {activeConversation.length > 0 ? (
+          {activeConversation.length > 0 || recId ? (
             <>
               <div className="chat-header">
                 <div className="chat-header-user">
