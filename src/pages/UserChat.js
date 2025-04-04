@@ -47,6 +47,7 @@ const UserChat = () => {
   }, [setActiveConversation]);
 
   useEffect(() => {
+    if(!recId) return;
     if (recId) {
       const userId = localStorage.getItem('id');
       fetchChat(recId);
@@ -132,7 +133,7 @@ const UserChat = () => {
 
   // Handle sending a message
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !activeConversation.length || sending) return;
+    if (!newMessage.trim() || sending) return;
 
     setSending(true); // Set sending state to true
     const userId = localStorage.getItem('id');
@@ -187,6 +188,7 @@ const UserChat = () => {
     setConversations(updatedConversations);
 
     const uid = localStorage.getItem('id');
+    setActiveConversation([]);
     if (conversation.receiverId === uid) {
       navigate(`/chat/${conversation.senderId}`);
       fetchChat(conversation.senderId);
