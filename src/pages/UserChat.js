@@ -38,6 +38,7 @@ const UserChat = () => {
       console.log('Received WebSocket message:', data);
       if (data.type === 'receive_message') {
         setActiveConversation((prevMessages) => [...prevMessages, data.message]);
+        // console.log('msg:', data.message);  
       }
     } catch (error) {
       console.error('Error parsing WebSocket message:', error);
@@ -168,6 +169,7 @@ const UserChat = () => {
       );
 
       setActiveConversation((prevMessages) => [...prevMessages, newMessageData]);
+      // console.log('active msg:', newMessageData);
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);

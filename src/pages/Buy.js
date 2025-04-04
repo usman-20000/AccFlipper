@@ -66,7 +66,7 @@ const Buy = () => {
         }
 
         const data = await response.json();
-        const activeData = data.filter((item) => item.status.toLowerCase() === "active");
+        const activeData = data.filter((item) => item.status.toLowerCase() === "active" && item.transactionType.sell === true);
         setAccounts(activeData);
       } catch (error) {
         console.error('Error fetching accounts:', error);
