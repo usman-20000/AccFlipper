@@ -160,9 +160,12 @@ const Exchange = () => {
                   <Card onClick={() => handleViewListing(account)} className="account-card">
                     <CardMedia
                       component="img"
-                      height="200"
                       image={account.uploadImage}
                       alt={account.accountName}
+                      sx={{
+                        height: '150px',
+                        objectFit: 'cover' // Resize mode equivalent
+                      }}
                     />
                     <CardContent>
                       <Typography variant="h6">{account.accountName}</Typography>

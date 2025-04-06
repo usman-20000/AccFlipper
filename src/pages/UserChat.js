@@ -35,7 +35,7 @@ const UserChat = () => {
   const handleWebSocketMessage = useCallback((event) => {
     try {
       const data = JSON.parse(event.data);
-      
+
       console.log('Received WebSocket message:', data);
       if (data.type === 'receive_message') {
         setActiveConversation((prevMessages) => [...prevMessages, data.message]);
@@ -47,11 +47,11 @@ const UserChat = () => {
   }, [setActiveConversation]);
 
   useEffect(() => {
-    if(!recId) return;
+    if (!recId) return;
     if (recId) {
       const userId = localStorage.getItem('id');
       fetchChat(recId);
-      markMessagesAsRead(userId, recId); 
+      markMessagesAsRead(userId, recId);
 
       const connectWebSocket = () => {
         const ws = new WebSocket('https://yt-realtime-production.up.railway.app');
@@ -69,8 +69,8 @@ const UserChat = () => {
             })
           );
           console.log(`Joined room: ${roomId}`);
-        };       
-        
+        };
+
         ws.onmessage = handleWebSocketMessage;
 
         ws.onerror = (error) => {
@@ -139,18 +139,17 @@ const UserChat = () => {
     setSending(true); // Set sending state to true
     const userId = localStorage.getItem('id');
     const name = localStorage.getItem('name');
-    const receiverId =
-      activeConversation[0]?.receiverId === userId
-        ? activeConversation[0]?.senderId
-        : activeConversation[0]?.receiverId;
+    // const receiverId =
+    //   activeConversation[0]?.receiverId === userId
+    //     ? activeConversation[0]?.senderId
+    //     : activeConversation[0]?.receiverId;
 
     const newMessageData = {
       senderId: userId,
-      receiverId,
+      receiverId: recId,
       senderName: name || 'Unknown',
       receiverName: receiverName || 'Unknown',
       text: newMessage,
-      time: new Date().toISOString(),
     };
 
     try {
@@ -164,7 +163,7 @@ const UserChat = () => {
         JSON.stringify({
           type: 'send_message',
           senderId: userId,
-          receiverId,
+          receiverId: recId,
           senderName: name || 'Unknown',
           receiverName: receiverName || 'Unknown',
           message: newMessage,
@@ -210,9 +209,8 @@ const UserChat = () => {
             {conversations.map((conversation) => (
               <div
                 key={conversation._id}
-                className={`chat-conversation-item ${
-                  activeConversation?._id === conversation._id ? 'active' : ''
-                } ${conversation?.unread ? 'unread' : ''}`}
+                className={`chat-conversation-item ${activeConversation?._id === conversation._id ? 'active' : ''
+                  } ${conversation?.unread ? 'unread' : ''}`}
                 onClick={() => handleSelectConversation(conversation)}
               >
                 <div className="chat-user-avatar">
@@ -260,9 +258,8 @@ const UserChat = () => {
                 {activeConversation.map((message, index) => (
                   <div
                     key={index}
-                    className={`chat-message ${
-                      message.senderId === id ? 'outgoing' : 'incoming'
-                    }`}
+                    className={`chat-message ${message.senderId === id ? 'outgoing' : 'incoming'
+                      }`}
                   >
                     <div className="chat-message-content">
                       <p>{message.text}</p>
