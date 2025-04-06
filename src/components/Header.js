@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css';
+import { fetchChatList } from '../utils/data';
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [unread, setUnread] = useState(null);
 
   // Handle scroll detection for header state changes
   useEffect(() => {
@@ -59,12 +61,32 @@ const Header = () => {
     setProfileMenuOpen(!profileMenuOpen);
   };
 
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const data = await fetchChatList();
+        console.log('Chat List:', data);
+        if (data) {
+          const unreadCount = data.filter((chat) => chat.unread).length;
+          setUnread(unreadCount);
+        } else {
+          setUnread(0);
+        }
+      } catch (error) {
+        console.error('Error fetching chat list:', error);
+      }
+    };
+
+    getData();
+  }, []);
+
   const navItems = [
     mobileMenuOpen && { name: 'Profile', path: '/Profile', onclick: () => setMobileMenuOpen(false) },
     { name: 'Home', path: '/', onclick: () => setMobileMenuOpen(false) },
     { name: 'Buy', path: '/buy', onclick: () => setMobileMenuOpen(false) },
     { name: 'Sell', path: '/sell', onclick: () => setMobileMenuOpen(false) },
     { name: 'Exchange', path: '/exchange', onclick: () => setMobileMenuOpen(false) },
+    { name: `Chat`, unread: unread, path: '/chat', onclick: () => setMobileMenuOpen(false) },
     mobileMenuOpen && { name: 'Logout', path: '/Login', onclick: () => { setMobileMenuOpen(false); localStorage.clear(); } },
   ];
 
@@ -97,9 +119,11 @@ const Header = () => {
                   onClick={item.onClick}
                 >
                   {item.name}
+                  {item.name === 'Chat' && unread > 0 && (
+                    <span className="unread-badge">{unread}</span>
+                  )}
                 </a>
               </li>
-
             ))}
             {!loggedIn ? (
               <li className="cta-nav-item" style={{ "--item-index": navItems.length }}>

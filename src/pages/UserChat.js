@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { BaseUrl, fetchUser, timeAgo } from '../utils/data';
+import { BaseUrl, fetchUser, markMessagesAsRead, timeAgo } from '../utils/data';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const UserChat = () => {
@@ -29,7 +29,7 @@ const UserChat = () => {
     const userId = localStorage.getItem('id');
     setId(userId);
     scrollToBottom();
-  }, [activeConversation, conversations, scrollToBottom]);
+  }, [activeConversation, conversations]);
 
   // Initialize WebSocket and handle events
   const handleWebSocketMessage = useCallback((event) => {
@@ -51,6 +51,7 @@ const UserChat = () => {
     if (recId) {
       const userId = localStorage.getItem('id');
       fetchChat(recId);
+      markMessagesAsRead(userId, recId); 
 
       const connectWebSocket = () => {
         const ws = new WebSocket('https://yt-realtime-production.up.railway.app');

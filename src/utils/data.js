@@ -77,3 +77,36 @@ export const updateOnline = async (status) => {
         console.log('error updating online status...', e);
     }
 }
+
+export const fetchChatList = async() => {
+    try {
+        const userId = localStorage.getItem('id');
+        const response = await fetch(`${BaseUrl}/chatList/${userId}`);
+        const json = await response.json();
+        return json;
+    } catch (error) {
+        console.error('Error fetching chat list:', error);
+    }
+}
+
+export const markMessagesAsRead = async (senderId, receiverId) => {
+    try {
+      const res = await fetch(`${BaseUrl}/mark-read`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ senderId, receiverId })
+      });
+  
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+  
+      const data = await res.json();
+      console.log(data.message); // "All messages marked as read"
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+  

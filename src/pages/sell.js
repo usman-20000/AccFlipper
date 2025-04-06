@@ -337,7 +337,6 @@ const Sell = () => {
                     exchange: type === 'exchange'
                 }
             }));
-            console.log('Single mode selected:', type, formData.transactionType.sell);
         } else {
             // In multiple mode, toggle the selected option
             setFormData(prev => ({

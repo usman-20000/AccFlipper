@@ -2,19 +2,17 @@ import React, { useEffect, useState, useRef } from 'react';
 import './LoadingScreen.css';
 
 const LoadingScreen = ({ finishLoading, contentLoaded }) => {
+
   const [counter, setCounter] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const loadingRef = useRef(null);
   
-  // Handle loading progress and completion
   useEffect(() => {
     let interval;
     
     if (contentLoaded) {
-      // Speed up loading when content is ready
       interval = setInterval(() => {
         setCounter(prevCounter => {
-          // Accelerate to 100% when content is ready
           const increment = prevCounter < 70 ? 5 : 3;
           const newValue = prevCounter + increment;
           
