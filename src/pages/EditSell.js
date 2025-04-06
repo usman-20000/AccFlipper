@@ -3,6 +3,7 @@ import './sell.css';
 import { BaseUrl } from '../utils/data';
 import { imageListItemBarClasses } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 const EditSell = () => {
 
@@ -437,381 +438,384 @@ const EditSell = () => {
     };
 
     return (
-        <div className="sell-page">
-            <div className="form-container">
-                <h2>List Your Account</h2>
+        <>
+            <div className="sell-page">
+                <div className="form-container">
+                    <h2>List Your Account</h2>
 
-                <div className={`transaction-type-selector ${transactionMode === 'multiple' ? 'multiple-mode' : ''}`}>
-                    <div className="transaction-header">
-                        <h3>What would you like to do with your account?</h3>
-                        <div className={`transaction-mode-toggle ${transactionMode === 'multiple' ? 'active' : ''}`}>
-                            <label className="toggle-switch">
+                    <div className={`transaction-type-selector ${transactionMode === 'multiple' ? 'multiple-mode' : ''}`}>
+                        <div className="transaction-header">
+                            <h3>What would you like to do with your account?</h3>
+                            <div className={`transaction-mode-toggle ${transactionMode === 'multiple' ? 'active' : ''}`}>
+                                <label className="toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        checked={transactionMode === 'multiple'}
+                                        onChange={toggleTransactionMode}
+                                    />
+                                    <span className="toggle-slider"></span>
+                                </label>
+                                <span className="toggle-label">
+                                    {transactionMode === 'multiple' ? 'Multiple options' : 'Single option'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className={`transaction-options ${transactionMode === 'multiple' ? 'multiple-mode' : ''}`}>
+                            <div
+                                className={`transaction-option ${formData.transactionType.sell ? 'selected' : ''}`}
+                                onClick={() => handleTransactionTypeChange('sell')}
+                            >
                                 <input
                                     type="checkbox"
-                                    checked={transactionMode === 'multiple'}
-                                    onChange={toggleTransactionMode}
+                                    id="sellOption"
+                                    checked={formData.transactionType.sell}
+                                    onChange={() => { }}
                                 />
-                                <span className="toggle-slider"></span>
-                            </label>
-                            <span className="toggle-label">
-                                {transactionMode === 'multiple' ? 'Multiple options' : 'Single option'}
-                            </span>
+                                <label htmlFor="sellOption">
+                                    <span className="option-icon">💰</span>
+                                    <span className="option-text">Sell</span>
+                                    <span className="option-description">List your account for sale</span>
+                                </label>
+                            </div>
+
+                            <div
+                                className={`transaction-option ${formData.transactionType.valuation ? 'selected' : ''}`}
+                                onClick={() => handleTransactionTypeChange('valuation')}
+                            >
+                                <input
+                                    type="checkbox"
+                                    id="valuationOption"
+                                    checked={formData.transactionType.valuation}
+                                    onChange={() => { }}
+                                />
+                                <label htmlFor="valuationOption">
+                                    <span className="option-icon">📊</span>
+                                    <span className="option-text">Get Valuation</span>
+                                    <span className="option-description">Find out what your account is worth</span>
+                                </label>
+                            </div>
+
+                            <div
+                                className={`transaction-option ${formData.transactionType.exchange ? 'selected' : ''}`}
+                                onClick={() => handleTransactionTypeChange('exchange')}
+                            >
+                                <input
+                                    type="checkbox"
+                                    id="exchangeOption"
+                                    checked={formData.transactionType.exchange}
+                                    onChange={() => { }}
+                                />
+                                <label htmlFor="exchangeOption">
+                                    <span className="option-icon">🔄</span>
+                                    <span className="option-text">Exchange</span>
+                                    <span className="option-description">Trade your account for another</span>
+                                </label>
+                            </div>
                         </div>
+
+                        {!isAnyTransactionSelected() && (
+                            <div className="transaction-warning">
+                                Please select at least one option to proceed
+                            </div>
+                        )}
+
+                        {transactionMode === 'multiple' && (
+                            <div className="transaction-info">
+                                <i className="info-icon">ℹ️</i> Click on multiple boxes to combine options (e.g., sell AND get a valuation)
+                            </div>
+                        )}
                     </div>
 
-                    <div className={`transaction-options ${transactionMode === 'multiple' ? 'multiple-mode' : ''}`}>
-                        <div
-                            className={`transaction-option ${formData.transactionType.sell ? 'selected' : ''}`}
-                            onClick={() => handleTransactionTypeChange('sell')}
-                        >
+                    <form id="sellAccountForm" onSubmit={handleSubmit}>
+                        <input type="hidden" name="csrf_token" value={csrfToken} />
+
+                        <div className="form-section">
+                            <h3>Account Details</h3>
+
+                            <div className="form-group">
+                                <label htmlFor="accountName">Account Name *</label>
+                                <input
+                                    type="text"
+                                    id="accountName"
+                                    name="accountName"
+                                    value={formData.accountName}
+                                    onChange={handleChange}
+                                    className={errors.accountName ? 'error' : ''}
+                                />
+                                {errors.accountName && <span className="error-message">{errors.accountName}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="accountURL">Account URL *</label>
+                                <input
+                                    type="url"
+                                    id="accountURL"
+                                    name="accountURL"
+                                    placeholder="https://example.com"
+                                    value={formData.accountURL}
+                                    onChange={handleChange}
+                                    className={errors.accountURL ? 'error' : ''}
+                                />
+                                {errors.accountURL && <span className="error-message">{errors.accountURL}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="accountAge">Account Age (years) *</label>
+                                <input
+                                    type="number"
+                                    id="accountAge"
+                                    name="accountAge"
+                                    min="0"
+                                    step="0.1"
+                                    value={formData.accountAge}
+                                    onChange={handleChange}
+                                    className={errors.accountAge ? 'error' : ''}
+                                />
+                                {errors.accountAge && <span className="error-message">{errors.accountAge}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="accountType">Account Type *</label>
+                                <select
+                                    id="accountType"
+                                    name="accountType"
+                                    value={formData.accountType}
+                                    onChange={handleChange}
+                                    className={errors.accountType ? 'error' : ''}
+                                >
+                                    <option value="">{formData.accountType || 'Select account type'}</option>
+                                    <option value="social">Social Media</option>
+                                    <option value="gaming">Gaming</option>
+                                    <option value="streaming">Streaming</option>
+                                    <option value="email">Email</option>
+                                    <option value="ecommerce">E-Commerce</option>
+                                    <option value="blog">Blog/Website</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                {errors.accountType && <span className="error-message">{errors.accountType}</span>}
+                            </div>
+
+                            {formData.accountType && (
+                                <div className="form-group">
+                                    <label htmlFor="platform">Platform *</label>
+                                    <select
+                                        id="platform"
+                                        name="platform"
+                                        value={formData.platform}
+                                        onChange={handleChange}
+                                        className={errors.platform ? 'error' : ''}>
+                                        <option value="">{formData.platform || 'Select platform'}</option>
+                                        {getAvailablePlatforms().map(platform => (
+                                            <option key={platform.value} value={platform.value}>
+                                                {platform.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.platform && <span className="error-message">{errors.platform}</span>}
+                                </div>
+                            )}
+                            <div className="form-group">
+                                <label htmlFor="contactEmail">Upload Image *</label>
+                                <input
+                                    type="file"
+                                    id="updloadImage"
+                                    name="updloadImage"
+                                    onChange={handleFileChange}
+                                    className={errors.contactEmail ? 'error' : ''}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <h3>Performance Metrics</h3>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label htmlFor="followers">Followers/Subscribers</label>
+                                    <input
+                                        type="text"
+                                        id="followers"
+                                        name="followers"
+                                        placeholder="e.g., 10000"
+                                        value={formData.followers}
+                                        onChange={handleChange}
+                                        className={errors.followers ? 'error' : ''}
+                                    />
+                                    {errors.followers && <span className="error-message">{errors.followers}</span>}
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="engagement">Engagement Rate (%)</label>
+                                    <input
+                                        type="text"
+                                        id="engagement"
+                                        name="engagement"
+                                        placeholder="e.g., 3.5"
+                                        value={formData.engagement}
+                                        onChange={handleChange}
+                                        className={errors.engagement ? 'error' : ''}
+                                    />
+                                    {errors.engagement && <span className="error-message">{errors.engagement}</span>}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="revenue">Monthly Revenue ($)</label>
+                                <input
+                                    type="text"
+                                    id="revenue"
+                                    name="revenue"
+                                    placeholder="e.g., 500"
+                                    value={formData.revenue}
+                                    onChange={handleChange}
+                                    className={errors.revenue ? 'error' : ''}
+                                />
+                                {errors.revenue && <span className="error-message">{errors.revenue}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="accountDescription">Description *</label>
+                                <textarea
+                                    id="accountDescription"
+                                    name="accountDescription"
+                                    rows="4"
+                                    placeholder="Describe your account, its niche, content, and any other relevant details"
+                                    value={formData.accountDescription}
+                                    onChange={handleChange}
+                                    className={errors.accountDescription ? 'error' : ''}
+                                ></textarea>
+                                {errors.accountDescription && <span className="error-message">{errors.accountDescription}</span>}
+                            </div>
+                        </div>
+
+                        {(formData.transactionType.sell || formData.transactionType.valuation) && (
+                            <div className="form-section">
+                                <h3>{formData.transactionType.sell ? 'Pricing' : 'Valuation'} Information</h3>
+
+                                <div className="form-group">
+                                    <label htmlFor="accountPrice">{formData.transactionType.sell ? 'Asking Price ($) *' : 'Desired Valuation ($)'}</label>
+                                    <input
+                                        type="number"
+                                        id="accountPrice"
+                                        name="accountPrice"
+                                        min="0"
+                                        step="0.01"
+                                        value={formData.accountPrice}
+                                        onChange={handleChange}
+                                        className={errors.accountPrice ? 'error' : ''}
+                                        required={formData.transactionType.sell}
+                                    />
+                                    {errors.accountPrice && <span className="error-message">{errors.accountPrice}</span>}
+                                </div>
+
+                                {formData.transactionType.sell && (
+                                    <div className="form-group">
+                                        <label htmlFor="preferredPayment">Preferred Payment Method</label>
+                                        <select
+                                            id="preferredPayment"
+                                            name="preferredPayment"
+                                            value={formData.preferredPayment}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="paypal">PayPal</option>
+                                            <option value="bankTransfer">Bank Transfer</option>
+                                            <option value="crypto">Cryptocurrency</option>
+                                            <option value="escrow">Escrow</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {formData.transactionType.exchange && (
+                            <div className="form-section">
+                                <h3>Exchange Details</h3>
+
+                                <div className="form-group">
+                                    <label htmlFor="exchangeRequirements">What are you looking for in exchange? *</label>
+                                    <textarea
+                                        id="exchangeRequirements"
+                                        name="exchangeRequirements"
+                                        rows="3"
+                                        placeholder="Describe what type of account you'd like to exchange for"
+                                        value={formData.exchangeRequirements}
+                                        onChange={handleChange}
+                                        className={errors.exchangeRequirements ? 'error' : ''}
+                                    ></textarea>
+                                    {errors.exchangeRequirements && <span className="error-message">{errors.exchangeRequirements}</span>}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="form-section">
+                            <h3>Contact Information</h3>
+
+                            <div className="form-group">
+                                <label htmlFor="contactEmail">Contact Email *</label>
+                                <input
+                                    type="email"
+                                    id="contactEmail"
+                                    name="contactEmail"
+                                    value={formData.contactEmail}
+                                    onChange={handleChange}
+                                    className={errors.contactEmail ? 'error' : ''}
+                                />
+                                {errors.contactEmail && <span className="error-message">{errors.contactEmail}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="phoneNumber">Phone Number (optional)</label>
+                                <input
+                                    type="tel"
+                                    id="phoneNumber"
+                                    name="phoneNumber"
+                                    placeholder="+1 (123) 456-7890"
+                                    value={formData.phoneNumber}
+                                    onChange={handleChange}
+                                    className={errors.phoneNumber ? 'error' : ''}
+                                />
+                                {errors.phoneNumber && <span className="error-message">{errors.phoneNumber}</span>}
+                            </div>
+                        </div>
+
+                        <div className="form-group checkbox-group">
                             <input
                                 type="checkbox"
-                                id="sellOption"
-                                checked={formData.transactionType.sell}
-                                onChange={() => { }}
+                                id="termsAgree"
+                                name="termsAgree"
+                                checked={formData.termsAgree}
+                                onChange={handleChange}
+                                className={errors.termsAgree ? 'error' : ''}
                             />
-                            <label htmlFor="sellOption">
-                                <span className="option-icon">💰</span>
-                                <span className="option-text">Sell</span>
-                                <span className="option-description">List your account for sale</span>
-                            </label>
+                            <label htmlFor="termsAgree">I agree to the Terms and Conditions *</label>
+                            {errors.termsAgree && <span className="error-message">{errors.termsAgree}</span>}
                         </div>
 
-                        <div
-                            className={`transaction-option ${formData.transactionType.valuation ? 'selected' : ''}`}
-                            onClick={() => handleTransactionTypeChange('valuation')}
+                        <button
+                            type="submit"
+                            className={getSubmitButtonClass()}
+                            disabled={!isAnyTransactionSelected()}
                         >
-                            <input
-                                type="checkbox"
-                                id="valuationOption"
-                                checked={formData.transactionType.valuation}
-                                onChange={() => { }}
-                            />
-                            <label htmlFor="valuationOption">
-                                <span className="option-icon">📊</span>
-                                <span className="option-text">Get Valuation</span>
-                                <span className="option-description">Find out what your account is worth</span>
-                            </label>
-                        </div>
-
-                        <div
-                            className={`transaction-option ${formData.transactionType.exchange ? 'selected' : ''}`}
-                            onClick={() => handleTransactionTypeChange('exchange')}
-                        >
-                            <input
-                                type="checkbox"
-                                id="exchangeOption"
-                                checked={formData.transactionType.exchange}
-                                onChange={() => { }}
-                            />
-                            <label htmlFor="exchangeOption">
-                                <span className="option-icon">🔄</span>
-                                <span className="option-text">Exchange</span>
-                                <span className="option-description">Trade your account for another</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    {!isAnyTransactionSelected() && (
-                        <div className="transaction-warning">
-                            Please select at least one option to proceed
-                        </div>
-                    )}
-
-                    {transactionMode === 'multiple' && (
-                        <div className="transaction-info">
-                            <i className="info-icon">ℹ️</i> Click on multiple boxes to combine options (e.g., sell AND get a valuation)
+                            {formData.transactionType.sell && !formData.transactionType.valuation && !formData.transactionType.exchange && 'List For Sale'}
+                            {!formData.transactionType.sell && formData.transactionType.valuation && !formData.transactionType.exchange && 'Request Valuation'}
+                            {!formData.transactionType.sell && !formData.transactionType.valuation && formData.transactionType.exchange && 'Post Exchange Offer'}
+                            {((formData.transactionType.sell && formData.transactionType.valuation) ||
+                                (formData.transactionType.sell && formData.transactionType.exchange) ||
+                                (formData.transactionType.valuation && formData.transactionType.exchange) ||
+                                (formData.transactionType.sell && formData.transactionType.valuation && formData.transactionType.exchange)) && 'Submit Listing'}
+                        </button>
+                    </form>
+                    {submitted && (
+                        <div className="success-message">
+                            Thank you for your submission! Your listing will be reviewed shortly.
                         </div>
                     )}
                 </div>
-
-                <form id="sellAccountForm" onSubmit={handleSubmit}>
-                    <input type="hidden" name="csrf_token" value={csrfToken} />
-
-                    <div className="form-section">
-                        <h3>Account Details</h3>
-
-                        <div className="form-group">
-                            <label htmlFor="accountName">Account Name *</label>
-                            <input
-                                type="text"
-                                id="accountName"
-                                name="accountName"
-                                value={formData.accountName}
-                                onChange={handleChange}
-                                className={errors.accountName ? 'error' : ''}
-                            />
-                            {errors.accountName && <span className="error-message">{errors.accountName}</span>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="accountURL">Account URL *</label>
-                            <input
-                                type="url"
-                                id="accountURL"
-                                name="accountURL"
-                                placeholder="https://example.com"
-                                value={formData.accountURL}
-                                onChange={handleChange}
-                                className={errors.accountURL ? 'error' : ''}
-                            />
-                            {errors.accountURL && <span className="error-message">{errors.accountURL}</span>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="accountAge">Account Age (years) *</label>
-                            <input
-                                type="number"
-                                id="accountAge"
-                                name="accountAge"
-                                min="0"
-                                step="0.1"
-                                value={formData.accountAge}
-                                onChange={handleChange}
-                                className={errors.accountAge ? 'error' : ''}
-                            />
-                            {errors.accountAge && <span className="error-message">{errors.accountAge}</span>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="accountType">Account Type *</label>
-                            <select
-                                id="accountType"
-                                name="accountType"
-                                value={formData.accountType}
-                                onChange={handleChange}
-                                className={errors.accountType ? 'error' : ''}
-                            >
-                                <option value="">{formData.accountType || 'Select account type'}</option>
-                                <option value="social">Social Media</option>
-                                <option value="gaming">Gaming</option>
-                                <option value="streaming">Streaming</option>
-                                <option value="email">Email</option>
-                                <option value="ecommerce">E-Commerce</option>
-                                <option value="blog">Blog/Website</option>
-                                <option value="other">Other</option>
-                            </select>
-                            {errors.accountType && <span className="error-message">{errors.accountType}</span>}
-                        </div>
-
-                        {formData.accountType && (
-                            <div className="form-group">
-                                <label htmlFor="platform">Platform *</label>
-                                <select
-                                    id="platform"
-                                    name="platform"
-                                    value={formData.platform}
-                                    onChange={handleChange}
-                                    className={errors.platform ? 'error' : ''}>
-                                    <option value="">{formData.platform || 'Select platform'}</option>
-                                    {getAvailablePlatforms().map(platform => (
-                                        <option key={platform.value} value={platform.value}>
-                                            {platform.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.platform && <span className="error-message">{errors.platform}</span>}
-                            </div>
-                        )}
-                        <div className="form-group">
-                            <label htmlFor="contactEmail">Upload Image *</label>
-                            <input
-                                type="file"
-                                id="updloadImage"
-                                name="updloadImage"
-                                onChange={handleFileChange}
-                                className={errors.contactEmail ? 'error' : ''}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <h3>Performance Metrics</h3>
-
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label htmlFor="followers">Followers/Subscribers</label>
-                                <input
-                                    type="text"
-                                    id="followers"
-                                    name="followers"
-                                    placeholder="e.g., 10000"
-                                    value={formData.followers}
-                                    onChange={handleChange}
-                                    className={errors.followers ? 'error' : ''}
-                                />
-                                {errors.followers && <span className="error-message">{errors.followers}</span>}
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="engagement">Engagement Rate (%)</label>
-                                <input
-                                    type="text"
-                                    id="engagement"
-                                    name="engagement"
-                                    placeholder="e.g., 3.5"
-                                    value={formData.engagement}
-                                    onChange={handleChange}
-                                    className={errors.engagement ? 'error' : ''}
-                                />
-                                {errors.engagement && <span className="error-message">{errors.engagement}</span>}
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="revenue">Monthly Revenue ($)</label>
-                            <input
-                                type="text"
-                                id="revenue"
-                                name="revenue"
-                                placeholder="e.g., 500"
-                                value={formData.revenue}
-                                onChange={handleChange}
-                                className={errors.revenue ? 'error' : ''}
-                            />
-                            {errors.revenue && <span className="error-message">{errors.revenue}</span>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="accountDescription">Description *</label>
-                            <textarea
-                                id="accountDescription"
-                                name="accountDescription"
-                                rows="4"
-                                placeholder="Describe your account, its niche, content, and any other relevant details"
-                                value={formData.accountDescription}
-                                onChange={handleChange}
-                                className={errors.accountDescription ? 'error' : ''}
-                            ></textarea>
-                            {errors.accountDescription && <span className="error-message">{errors.accountDescription}</span>}
-                        </div>
-                    </div>
-
-                    {(formData.transactionType.sell || formData.transactionType.valuation) && (
-                        <div className="form-section">
-                            <h3>{formData.transactionType.sell ? 'Pricing' : 'Valuation'} Information</h3>
-
-                            <div className="form-group">
-                                <label htmlFor="accountPrice">{formData.transactionType.sell ? 'Asking Price ($) *' : 'Desired Valuation ($)'}</label>
-                                <input
-                                    type="number"
-                                    id="accountPrice"
-                                    name="accountPrice"
-                                    min="0"
-                                    step="0.01"
-                                    value={formData.accountPrice}
-                                    onChange={handleChange}
-                                    className={errors.accountPrice ? 'error' : ''}
-                                    required={formData.transactionType.sell}
-                                />
-                                {errors.accountPrice && <span className="error-message">{errors.accountPrice}</span>}
-                            </div>
-
-                            {formData.transactionType.sell && (
-                                <div className="form-group">
-                                    <label htmlFor="preferredPayment">Preferred Payment Method</label>
-                                    <select
-                                        id="preferredPayment"
-                                        name="preferredPayment"
-                                        value={formData.preferredPayment}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="paypal">PayPal</option>
-                                        <option value="bankTransfer">Bank Transfer</option>
-                                        <option value="crypto">Cryptocurrency</option>
-                                        <option value="escrow">Escrow</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {formData.transactionType.exchange && (
-                        <div className="form-section">
-                            <h3>Exchange Details</h3>
-
-                            <div className="form-group">
-                                <label htmlFor="exchangeRequirements">What are you looking for in exchange? *</label>
-                                <textarea
-                                    id="exchangeRequirements"
-                                    name="exchangeRequirements"
-                                    rows="3"
-                                    placeholder="Describe what type of account you'd like to exchange for"
-                                    value={formData.exchangeRequirements}
-                                    onChange={handleChange}
-                                    className={errors.exchangeRequirements ? 'error' : ''}
-                                ></textarea>
-                                {errors.exchangeRequirements && <span className="error-message">{errors.exchangeRequirements}</span>}
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="form-section">
-                        <h3>Contact Information</h3>
-
-                        <div className="form-group">
-                            <label htmlFor="contactEmail">Contact Email *</label>
-                            <input
-                                type="email"
-                                id="contactEmail"
-                                name="contactEmail"
-                                value={formData.contactEmail}
-                                onChange={handleChange}
-                                className={errors.contactEmail ? 'error' : ''}
-                            />
-                            {errors.contactEmail && <span className="error-message">{errors.contactEmail}</span>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="phoneNumber">Phone Number (optional)</label>
-                            <input
-                                type="tel"
-                                id="phoneNumber"
-                                name="phoneNumber"
-                                placeholder="+1 (123) 456-7890"
-                                value={formData.phoneNumber}
-                                onChange={handleChange}
-                                className={errors.phoneNumber ? 'error' : ''}
-                            />
-                            {errors.phoneNumber && <span className="error-message">{errors.phoneNumber}</span>}
-                        </div>
-                    </div>
-
-                    <div className="form-group checkbox-group">
-                        <input
-                            type="checkbox"
-                            id="termsAgree"
-                            name="termsAgree"
-                            checked={formData.termsAgree}
-                            onChange={handleChange}
-                            className={errors.termsAgree ? 'error' : ''}
-                        />
-                        <label htmlFor="termsAgree">I agree to the Terms and Conditions *</label>
-                        {errors.termsAgree && <span className="error-message">{errors.termsAgree}</span>}
-                    </div>
-
-                    <button
-                        type="submit"
-                        className={getSubmitButtonClass()}
-                        disabled={!isAnyTransactionSelected()}
-                    >
-                        {formData.transactionType.sell && !formData.transactionType.valuation && !formData.transactionType.exchange && 'List For Sale'}
-                        {!formData.transactionType.sell && formData.transactionType.valuation && !formData.transactionType.exchange && 'Request Valuation'}
-                        {!formData.transactionType.sell && !formData.transactionType.valuation && formData.transactionType.exchange && 'Post Exchange Offer'}
-                        {((formData.transactionType.sell && formData.transactionType.valuation) ||
-                            (formData.transactionType.sell && formData.transactionType.exchange) ||
-                            (formData.transactionType.valuation && formData.transactionType.exchange) ||
-                            (formData.transactionType.sell && formData.transactionType.valuation && formData.transactionType.exchange)) && 'Submit Listing'}
-                    </button>
-                </form>
-                {submitted && (
-                    <div className="success-message">
-                        Thank you for your submission! Your listing will be reviewed shortly.
-                    </div>
-                )}
             </div>
-        </div>
+            <Footer />
+        </>
     );
 };
 

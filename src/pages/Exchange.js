@@ -38,6 +38,7 @@ import {
 } from '@mui/icons-material';
 import { BaseUrl, timeAgo } from "../utils/data";
 import './Buy.css';
+import Footer from '../components/Footer';
 
 const Exchange = () => {
   const [accounts, setAccounts] = useState([]);
@@ -121,134 +122,137 @@ const Exchange = () => {
   };
 
   return (
-    <Box className="buy-page">
-      <Container sx={{ py: 12 }}>
-        {/* Search and Filter Section */}
-        <Box className="search-filter-container">
-          <TextField
-            placeholder="Search accounts..."
-            variant="outlined"
-            fullWidth
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon color="action" />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-
-        {/* Account Listings */}
-        <Grid container spacing={3}>
-          {loading
-            ? Array(8)
-              .fill()
-              .map((_, index) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                  <Skeleton variant="rectangular" height={200} />
-                  <Skeleton variant="text" height={32} width="80%" />
-                  <Skeleton variant="text" height={20} width="60%" />
-                </Grid>
-              ))
-            : currentAccounts.map((account) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={account._id}>
-                <Card onClick={() => handleViewListing(account)} className="account-card">
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={account.uploadImage}
-                    alt={account.accountName}
-                  />
-                  <CardContent>
-                    <Typography variant="h6">{account.accountName}</Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {account.accountDescription}
-                    </Typography>
-                    {/* <Typography variant="h6" color="primary">
-                      ${account.accountPrice}
-                    </Typography> */}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      startIcon={<ShoppingCartIcon />}
-                      fullWidth
-                    >
-                      Exchange
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-        </Grid>
-
-        {/* Pagination */}
-        {!loading && (
-          <Box className="pagination-container">
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-              size="large"
-              showFirstButton
-              showLastButton
+    <>
+      <Box className="buy-page">
+        <Container sx={{ py: 12 }}>
+          {/* Search and Filter Section */}
+          <Box className="search-filter-container">
+            <TextField
+              placeholder="Search accounts..."
+              variant="outlined"
+              fullWidth
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
             />
           </Box>
-        )}
-      </Container>
-      {showListingModal && selectedListing && (
-        <div className="admin-modal-backdrop" onClick={() => setShowListingModal(false)}>
-          <div className="admin-modal" onClick={e => e.stopPropagation()}>
-            <div className="admin-modal-header">
-              <h3 className="admin-modal-title">{selectedListing.accountName}</h3>
-              <button className="admin-modal-close" onClick={() => setShowListingModal(false)}>×</button>
-            </div>
-            <div className="admin-modal-body">
-              <div className="listing-detail-tabs">
-                <div className="listing-detail-section">
-                  <h4>Listing Information</h4>
-                  <p><strong>Name:</strong> {selectedListing.accountName}</p>
-                  {/* <p><strong>Price:</strong> {selectedListing.accountPrice}</p> */}
-                  {/* <p><strong>Seller:</strong> {selectedListing.seller}</p>
-                        <p><strong>Type:</strong> {selectedListing.type}</p> */}
-                  <p><strong>Status:</strong> {selectedListing.status}</p>
-                  <p><strong>Listed On:</strong> {selectedListing.createdAt && timeAgo(selectedListing.createdAt)}</p>
 
-                  <h4>Description</h4>
-                  <p>
-                    {selectedListing.accountDescription}
-                  </p>
-                </div>
-
-                <div className="listing-admin-actions">
-                  <h4 style={{ marginBottom: '5%' }}>Actions</h4>
-                  <div className="admin-action-buttons">
-                    {selectedListing.status.toLowerCase() === 'pending' && (
-                      <button
-                        className="admin-btn admin-btn-primary"
-                        onClick={() => {
-                          // handleStatusChange(selectedListing._id, 'Active');
-                          setShowListingModal(false);
-                        }}
+          {/* Account Listings */}
+          <Grid container spacing={3}>
+            {loading
+              ? Array(8)
+                .fill()
+                .map((_, index) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                    <Skeleton variant="rectangular" height={200} />
+                    <Skeleton variant="text" height={32} width="80%" />
+                    <Skeleton variant="text" height={20} width="60%" />
+                  </Grid>
+                ))
+              : currentAccounts.map((account) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={account._id}>
+                  <Card onClick={() => handleViewListing(account)} className="account-card">
+                    <CardMedia
+                      component="img"
+                      height="200"
+                      image={account.uploadImage}
+                      alt={account.accountName}
+                    />
+                    <CardContent>
+                      <Typography variant="h6">{account.accountName}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {account.accountDescription}
+                      </Typography>
+                      {/* <Typography variant="h6" color="primary">
+                      ${account.accountPrice}
+                    </Typography> */}
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<ShoppingCartIcon />}
+                        fullWidth
                       >
-                        Approve Listing
-                      </button>
-                    )}
+                        Exchange
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+          </Grid>
 
-                    <a href={`/chat/${selectedListing.userId}`} className="admin-btn admin-btn-secondary">
-                      Message
-                    </a>
+          {/* Pagination */}
+          {!loading && (
+            <Box className="pagination-container">
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                size="large"
+                showFirstButton
+                showLastButton
+              />
+            </Box>
+          )}
+        </Container>
+        {showListingModal && selectedListing && (
+          <div className="admin-modal-backdrop" onClick={() => setShowListingModal(false)}>
+            <div className="admin-modal" onClick={e => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <h3 className="admin-modal-title">{selectedListing.accountName}</h3>
+                <button className="admin-modal-close" onClick={() => setShowListingModal(false)}>×</button>
+              </div>
+              <div className="admin-modal-body">
+                <div className="listing-detail-tabs">
+                  <div className="listing-detail-section">
+                    <h4>Listing Information</h4>
+                    <p><strong>Name:</strong> {selectedListing.accountName}</p>
+                    {/* <p><strong>Price:</strong> {selectedListing.accountPrice}</p> */}
+                    {/* <p><strong>Seller:</strong> {selectedListing.seller}</p>
+                        <p><strong>Type:</strong> {selectedListing.type}</p> */}
+                    <p><strong>Status:</strong> {selectedListing.status}</p>
+                    <p><strong>Listed On:</strong> {selectedListing.createdAt && timeAgo(selectedListing.createdAt)}</p>
+
+                    <h4>Description</h4>
+                    <p>
+                      {selectedListing.accountDescription}
+                    </p>
+                  </div>
+
+                  <div className="listing-admin-actions">
+                    <h4 style={{ marginBottom: '5%' }}>Actions</h4>
+                    <div className="admin-action-buttons">
+                      {selectedListing.status.toLowerCase() === 'pending' && (
+                        <button
+                          className="admin-btn admin-btn-primary"
+                          onClick={() => {
+                            // handleStatusChange(selectedListing._id, 'Active');
+                            setShowListingModal(false);
+                          }}
+                        >
+                          Approve Listing
+                        </button>
+                      )}
+
+                      <a href={`/chat/${selectedListing.userId}`} className="admin-btn admin-btn-secondary">
+                        Message
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </Box>
+        )}
+      </Box>
+      <Footer />
+    </>
   );
 };
 

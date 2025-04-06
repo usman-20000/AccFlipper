@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Login.css';
 import { BaseUrl } from '../utils/data';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 
 function Login() {
@@ -74,115 +75,118 @@ function Login() {
     };
 
     return (
-        <div className="login-container">
-            <div className="form-container">
-                <h2>{isSignup ? 'Create Account' : 'Welcome Back'}</h2>
-                <form onSubmit={handleSubmit}>
-                    {isSignup && (
-                        <>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Username"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    name="phone"
-                                    placeholder="Phone Number"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    name="country"
-                                    placeholder="Country"
-                                    value={formData.country}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    name="city"
-                                    placeholder="City"
-                                    value={formData.city}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    name="address"
-                                    placeholder="Address"
-                                    value={formData.address}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </>
-                    )}
-                    <div className="form-group">
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            autoFocus
-                        />
-                    </div>
-                    <div className="form-group">
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    {isSignup && (
+        <>
+            <div className="login-container">
+                <div className="form-container">
+                    <h2>{isSignup ? 'Create Account' : 'Welcome Back'}</h2>
+                    <form onSubmit={handleSubmit}>
+                        {isSignup && (
+                            <>
+                                <div className="form-group">
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        placeholder="Username"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <input
+                                        type="text"
+                                        name="phone"
+                                        placeholder="Phone Number"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <input
+                                        type="text"
+                                        name="country"
+                                        placeholder="Country"
+                                        value={formData.country}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        placeholder="City"
+                                        value={formData.city}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <input
+                                        type="text"
+                                        name="address"
+                                        placeholder="Address"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </>
+                        )}
+                        <div className="form-group">
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                                autoFocus
+                            />
+                        </div>
                         <div className="form-group">
                             <input
                                 type="password"
-                                name="confirmPassword"
-                                placeholder="Confirm Password"
-                                value={confirmPassword}
-                                onChange={handleConfirmPass}
+                                name="password"
+                                placeholder="Password"
+                                value={formData.password}
+                                onChange={handleChange}
                                 required
                             />
                         </div>
-                    )}
-                    <button type="submit" disabled={isSubmitting}>
-                        {isSubmitting
-                            ? (isSignup ? 'Creating Account...' : 'Signing In...')
-                            : (isSignup ? 'Create Account' : 'Sign In')
-                        }
-                    </button>
-                </form>
-                <p>
-                    {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-                    <button
-                        className="switch-btn"
-                        onClick={() => setIsSignup(!isSignup)}
-                    >
-                        {isSignup ? 'Sign In' : 'Sign Up'}
-                    </button>
-                </p>
+                        {isSignup && (
+                            <div className="form-group">
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    placeholder="Confirm Password"
+                                    value={confirmPassword}
+                                    onChange={handleConfirmPass}
+                                    required
+                                />
+                            </div>
+                        )}
+                        <button type="submit" disabled={isSubmitting}>
+                            {isSubmitting
+                                ? (isSignup ? 'Creating Account...' : 'Signing In...')
+                                : (isSignup ? 'Create Account' : 'Sign In')
+                            }
+                        </button>
+                    </form>
+                    <p>
+                        {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
+                        <button
+                            className="switch-btn"
+                            onClick={() => setIsSignup(!isSignup)}
+                        >
+                            {isSignup ? 'Sign In' : 'Sign Up'}
+                        </button>
+                    </p>
+                </div>
             </div>
-        </div>
+            <Footer />
+        </>
     );
 }
 

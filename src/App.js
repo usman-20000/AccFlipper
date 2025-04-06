@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -46,7 +46,7 @@ function App() {
     const updateStatus = () => {
       const onlineStatus = navigator.onLine;
       setIsOnline(onlineStatus);
-      updateOnline(onlineStatus); // Update backend status
+      updateOnline(onlineStatus);
     };
 
     const handleTabClose = () => {
@@ -125,6 +125,7 @@ function App() {
     }
   }, [loading, contentLoaded]);
 
+
   return (
     <Router>
       <ErrorBoundary>
@@ -159,8 +160,8 @@ function App() {
                   </Route>
                 </Routes>
               </main>
-              <Footer />
-              {/* <ScrollToTopButton /> */}
+              {/* <Footer /> */}
+              <ScrollToTopButton />
             </>
           )}
         </div>

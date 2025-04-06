@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Profile.css';
 import { BaseUrl, timeAgo } from '../utils/data';
+import Footer from '../components/Footer';
 
 const Profile = () => {
     const [user, setUser] = useState({});
@@ -390,20 +391,23 @@ const Profile = () => {
     );
 
     return (
-        <div className="profile-container">
-            <div className="profile-header">
-                <div className="profile-avatar"></div>
-                <h1 className="profile-title">{user.name}</h1>
-            </div>
+        <>
+            <div className="profile-container">
+                <div className="profile-header">
+                    <div className="profile-avatar"></div>
+                    <h1 className="profile-title">{user.name}</h1>
+                </div>
 
-            <div id="profile-view-mode">
-                {isEditing ? renderEditProfileView() : renderProfileView()}
-                {currentView === 'listings' && !selectedListing && renderListings()}
-                {currentView === 'listings' && selectedListing && renderListingDetails()}
-                {currentView === 'notifications' && !selectedNotification && renderNotifications()}
-                {currentView === 'notifications' && selectedNotification && renderNotificationDetails()}
+                <div id="profile-view-mode">
+                    {isEditing ? renderEditProfileView() : renderProfileView()}
+                    {currentView === 'listings' && !selectedListing && renderListings()}
+                    {currentView === 'listings' && selectedListing && renderListingDetails()}
+                    {currentView === 'notifications' && !selectedNotification && renderNotifications()}
+                    {currentView === 'notifications' && selectedNotification && renderNotificationDetails()}
+                </div>
             </div>
-        </div>
+            <Footer />
+        </>
     );
 };
 

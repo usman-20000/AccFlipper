@@ -9,6 +9,7 @@ import ValuationCenter from './ValuationCenter';
 import AdminChat from './AdminChat';
 import Overview from './Overview';
 import { BaseUrl } from '../utils/data';
+import Footer from '../components/Footer';
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
@@ -143,63 +144,66 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="admin-panel">
-      <Sidebar
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-        stats={stats}
-      />
-      <div className="admin-content">
-        <header className="admin-header">
-          <h1>Admin Dashboard</h1>
-          <div className="admin-header-actions">
-            <div className="admin-notifications">
-              <span className="icon" onClick={toggleNotifications}>
-                <i className="fa fa-bell"></i>
-              </span>
-              {headerNotifications.filter(n => !n.read).length > 0 && (
-                <span className="badge">{headerNotifications.filter(n => !n.read).length}</span>
-              )}
+    <>
+      <div className="admin-panel">
+        <Sidebar
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          stats={stats}
+        />
+        <div className="admin-content">
+          <header className="admin-header">
+            <h1>Admin Dashboard</h1>
+            <div className="admin-header-actions">
+              <div className="admin-notifications">
+                <span className="icon" onClick={toggleNotifications}>
+                  <i className="fa fa-bell"></i>
+                </span>
+                {headerNotifications.filter(n => !n.read).length > 0 && (
+                  <span className="badge">{headerNotifications.filter(n => !n.read).length}</span>
+                )}
 
-              {/* Notifications dropdown */}
-              <div className={`admin-notification-dropdown ${showNotifications ? 'show' : ''}`}>
-                <div className="admin-notification-dropdown-header">
-                  <h3>Notifications</h3>
-                  <span>{headerNotifications.filter(n => !n.read).length} new</span>
-                </div>
-                <div className="admin-notification-dropdown-body">
-                  {headerNotifications.length > 0 ? (
-                    headerNotifications.map(notif => (
-                      <div key={notif.id} className="admin-notification-item">
-                        <p className="admin-notification-message">{notif.message}</p>
-                        <span className="admin-notification-time">{notif.time}</span>
+                {/* Notifications dropdown */}
+                <div className={`admin-notification-dropdown ${showNotifications ? 'show' : ''}`}>
+                  <div className="admin-notification-dropdown-header">
+                    <h3>Notifications</h3>
+                    <span>{headerNotifications.filter(n => !n.read).length} new</span>
+                  </div>
+                  <div className="admin-notification-dropdown-body">
+                    {headerNotifications.length > 0 ? (
+                      headerNotifications.map(notif => (
+                        <div key={notif.id} className="admin-notification-item">
+                          <p className="admin-notification-message">{notif.message}</p>
+                          <span className="admin-notification-time">{notif.time}</span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="admin-notification-item">
+                        <p className="admin-notification-message">No new notifications</p>
                       </div>
-                    ))
-                  ) : (
-                    <div className="admin-notification-item">
-                      <p className="admin-notification-message">No new notifications</p>
-                    </div>
-                  )}
-                </div>
-                <div className="admin-notification-dropdown-footer">
-                  <a href="#" onClick={() => setActiveSection('notifications')}>
-                    View all notifications
-                  </a>
+                    )}
+                  </div>
+                  <div className="admin-notification-dropdown-footer">
+                    <a href="#" onClick={() => setActiveSection('notifications')}>
+                      View all notifications
+                    </a>
+                  </div>
                 </div>
               </div>
+              <div className="admin-user">
+                <span className="admin-username">Admin</span>
+                <div className="admin-avatar"></div>
+              </div>
             </div>
-            <div className="admin-user">
-              <span className="admin-username">Admin</span>
-              <div className="admin-avatar"></div>
-            </div>
-          </div>
-        </header>
+          </header>
 
-        <main className="admin-main-content">
-          {renderActiveSection()}
-        </main>
+          <main className="admin-main-content">
+            {renderActiveSection()}
+          </main>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 

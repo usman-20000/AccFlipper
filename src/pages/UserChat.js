@@ -201,7 +201,7 @@ const UserChat = () => {
 
   return (
     <div className="admin-chat" style={{ marginTop: '5%' }}>
-      <div className="chat-container" style={{ height: '500px' }}>
+      <div className="chat-container" style={{ height: '520px' }}>
         <div className="chat-sidebar">
           <div className="chat-sidebar-header">
             <h3>Conversations</h3>
