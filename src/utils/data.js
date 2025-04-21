@@ -1,5 +1,7 @@
 
-export const BaseUrl = "https://yt-sale-api.vercel.app";
+// export const BaseUrl = "https://yt-sale-api.vercel.app";
+export const BaseUrl = "http://localhost:4000"
+export let CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dgh6eftpe/image/upload";
 
 export const timeAgo = (date1) => {
     const date = new Date(date1);
@@ -78,7 +80,7 @@ export const updateOnline = async (status) => {
     }
 }
 
-export const fetchChatList = async() => {
+export const fetchChatList = async () => {
     try {
         const userId = localStorage.getItem('id');
         const response = await fetch(`${BaseUrl}/chatList/${userId}`);
@@ -91,22 +93,21 @@ export const fetchChatList = async() => {
 
 export const markMessagesAsRead = async (senderId, receiverId) => {
     try {
-      const res = await fetch(`${BaseUrl}/mark-read`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ senderId, receiverId })
-      });
-  
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-  
-      const data = await res.json();
-      console.log(data.message); // "All messages marked as read"
+        const res = await fetch(`${BaseUrl}/mark-read`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ senderId, receiverId })
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        console.log(data.message); // "All messages marked as read"
     } catch (error) {
-      console.error('Error marking messages as read:', error);
+        console.error('Error marking messages as read:', error);
     }
-  };
-  
+};

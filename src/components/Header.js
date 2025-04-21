@@ -62,12 +62,13 @@ const Header = () => {
   };
 
   useEffect(() => {
+    const id = localStorage.getItem('id');
     const getData = async () => {
       try {
         const data = await fetchChatList();
         console.log('Chat List:', data);
         if (data) {
-          const unreadCount = data.filter((chat) => chat.unread).length;
+          const unreadCount = data.filter((chat) => chat.receiverId === id && chat.unread).length;
           setUnread(unreadCount);
         } else {
           setUnread(0);
