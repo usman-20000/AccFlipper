@@ -46,9 +46,9 @@ const UserChat = () => {
   const handleWebSocketMessage = useCallback((event) => {
     try {
       const data = JSON.parse(event.data);
+      console.log('Received WebSocket message:', data); // Debug log
       if (data.type === 'receive_message') {
         setActiveConversation((prevMessages) => {
-          // Prevent duplicate messages
           if (prevMessages.some((msg) => msg._id === data.message._id)) {
             return prevMessages;
           }
@@ -70,6 +70,7 @@ const UserChat = () => {
 
     const connectWebSocket = () => {
       const ws = new WebSocket('https://yt-realtime-production.up.railway.app');
+      // const ws = new WebSocket('ws://localhost:4001');
       socketRef.current = ws;
 
       ws.onopen = () => {
@@ -82,6 +83,7 @@ const UserChat = () => {
       ws.onerror = (error) => console.error('WebSocket error:', error);
 
       ws.onclose = () => {
+        console.warn('WebSocket closed. Reconnecting...');
         setTimeout(connectWebSocket, 5000); // Reconnect after 5 seconds
       };
     };
@@ -140,22 +142,22 @@ const UserChat = () => {
   // Send message
   const handleSendMessage = async () => {
     if ((!newMessage.trim() && !image) || sending) return;
-
+  
     setSending(true);
     const userId = localStorage.getItem('id');
     const name = localStorage.getItem('name');
     let cloudinaryData;
-
+  
     if (image) {
       try {
         const form = new FormData();
         form.append('file', image);
         form.append('upload_preset', 'FirstAccFlipper_preset');
         form.append('cloud_name', 'dgh6eftpe');
-
+  
         const cloudinaryResponse = await fetch(CLOUDINARY_URL, { method: 'POST', body: form });
         cloudinaryData = await cloudinaryResponse.json();
-
+  
         if (!cloudinaryData.secure_url) {
           alert('Image upload failed. Please try again.');
           setSending(false);
@@ -167,23 +169,25 @@ const UserChat = () => {
         return;
       }
     }
-
+  
     const newMessageData = {
       senderId: userId,
       receiverId: recId,
       senderName: name || 'Unknown',
       receiverName: receiverName || 'Unknown',
-      text: modalMessage || newMessage,
+      text: modalMessage || newMessage, // Ensure `text` is included
       image: image ? cloudinaryData.secure_url : null,
     };
-
+  
+    console.log('Sending message:', newMessageData); // Debug log
+  
     try {
       const response = await fetch(`${BaseUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newMessageData),
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         console.log('response', data);
@@ -191,8 +195,7 @@ const UserChat = () => {
         console.log('ERROR:', data);
       }
       socketRef.current?.send(JSON.stringify({ ...newMessageData, type: 'send_message' }));
-      setActiveConversation((prevMessages) => [...prevMessages, newMessageData]);
-      console.log('newmsg:', newMessage);
+      // setActiveConversation((prevMessages) => [...prevMessages, newMessageData]);
       setNewMessage('');
       setImage(null);
     } catch (error) {
@@ -281,30 +284,37 @@ const UserChat = () => {
                 </div>
               </div>
               <div className="chat-messages">
-                {activeConversation.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`chat-message ${message.senderId === id ? 'outgoing' : 'incoming'}`}
-                  >
-                    <div className="chat-message-content">
-                      {message.image && (
-                        <img
-                          src={message.image}
-                          alt="Message"
-                          style={{ height: 120, width: 200, borderRadius: 5 }}
-                        />
-                      )}
-                      <p className="text-sm break-words text-left">
-                        <LinkifyText text={message.text || ''} />
-                      </p>
-                      <span className="chat-message-time">
-                        {message.createdAt && timeAgo(message.createdAt)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
+  {activeConversation.map((message, index) => (
+    <div
+      key={index}
+      className={`chat-message ${message.senderId === id ? 'outgoing' : 'incoming'}`}
+    >
+      <div className="chat-message-content">
+        {message.image && (
+          <img
+            src={message.image}
+            alt="Message"
+            style={{ height: 120, width: 200, borderRadius: 5 }}
+          />
+        )}
+        {message.text ? (
+          <p
+            className="text-sm break-words text-left w-full"
+            style={{ textAlign: 'left', width: '100%' }}
+          >
+            <LinkifyText text={message.text} />
+          </p>
+        ) : (
+          <p className="text-sm text-gray-500 italic">No message content</p>
+        )}
+        <span className="chat-message-time">
+          {message.createdAt && timeAgo(message.createdAt)}
+        </span>
+      </div>
+    </div>
+  ))}
+  <div ref={messagesEndRef} />
+</div>
               <div className="chat-input w-full">
                 <IconButton color="primary" component="label">
                   <input hidden accept="image/*" type="file" onChange={handleFileChange} />

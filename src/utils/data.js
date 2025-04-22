@@ -1,6 +1,6 @@
 
-// export const BaseUrl = "https://yt-sale-api.vercel.app";
-export const BaseUrl = "http://localhost:4000"
+export const BaseUrl = "https://yt-sale-api.vercel.app";
+// export const BaseUrl = "http://localhost:4000"
 export let CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dgh6eftpe/image/upload";
 
 export const timeAgo = (date1) => {
