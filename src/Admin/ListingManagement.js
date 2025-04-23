@@ -92,6 +92,7 @@ const ListingManagement = ({ initialFilter = 'all' }) => {
       }
       if (response.ok) {
         setListings(data);
+        setFilterStatus('all');
       }
     } catch (error) {
       console.error('Error fetching listings:', error);

@@ -43,6 +43,7 @@ const ValuationCenter = ({ initialFilter = 'all' }) => {
         const data = await response.json();
         const valuations = data.filter(listing => listing.transactionType.valuation === true);
         setValuationRequests(valuations);
+        setFilterStatus('all');
       }
     } catch (error) {
       console.error('Error:', error);

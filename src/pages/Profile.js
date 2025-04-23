@@ -186,7 +186,7 @@ const Profile = () => {
                         <span className="action-icon">🔔</span>
                         Notifications
                         {notification?.filter(n => !n.seen).length > 0 && (
-                            <span className="count-badge">{notification.filter(n => !n.read).length}</span>
+                            <span className="count-badge">{notification?.filter(n => !n.read).length}</span>
                         )}
                     </button>
                 </div>

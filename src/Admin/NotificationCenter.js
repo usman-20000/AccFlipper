@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { BaseUrl } from '../utils/data';
 
 const NotificationCenter = () => {
   const [notificationMode, setNotificationMode] = useState('send');
   const [selectedUserType, setSelectedUserType] = useState('all');
   const [notificationSubject, setNotificationSubject] = useState('');
   const [notificationContent, setNotificationContent] = useState('');
-  
+
   const [sentNotifications, setSentNotifications] = useState([
     {
       id: 1,
@@ -33,50 +34,51 @@ const NotificationCenter = () => {
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
 
-  const handleSendNotification = (e) => {
+  const handleSendNotification = async (e) => {
     e.preventDefault();
-    
+  
     if (!notificationSubject || !notificationContent) {
       alert('Please fill in all fields');
       return;
     }
-    
-    // In a real app, this would send the notification via an API call
-    console.log('Sending notification:', {
-      subject: notificationSubject,
-      content: notificationContent,
-      recipientType: selectedUserType
-    });
-    
-    // Add to sent notifications
-    const newNotification = {
-      id: sentNotifications.length + 1,
-      subject: notificationSubject,
-      recipients: selectedUserType === 'all' ? 'All Users' : `All ${selectedUserType}`,
-      date: new Date().toISOString().split('T')[0],
-      status: 'Sent'
-    };
-    
-    setSentNotifications([newNotification, ...sentNotifications]);
-    
-    // Reset form
-    setNotificationSubject('');
-    setNotificationContent('');
-    setSelectedUserType('all');
-    
-    // Show success message
-    alert('Notification sent successfully!');
+  
+    try {
+      const response = await fetch(`${BaseUrl}/send-notification-to-all`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: "admin",
+          heading: notificationSubject,
+          subHeading: notificationContent,
+          path: "/dashboard"
+        })
+      });
+  
+      if (response.ok) {
+        alert('Notifications sent successfully.');
+      } else {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        alert(`Failed to send notifications: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      alert('An error occurred while sending notifications.');
+    }
   };
+  
 
   const handleViewNotification = (notification) => {
     setSelectedNotification(notification);
     setShowNotificationModal(true);
   };
-  
+
   const handleResendNotification = (notification) => {
     // In a real app, this would call an API to resend the notification
     console.log('Resending notification:', notification);
-    
+
     // Show feedback to the user
     alert(`Notification "${notification.subject}" has been resent to ${notification.recipients}`);
   };
@@ -84,64 +86,60 @@ const NotificationCenter = () => {
   return (
     <div className="notification-center">
       <h2>Notification Center</h2>
-      
+
       <div className="notification-tabs">
-        <button 
+        <button
           className={`notification-tab ${notificationMode === 'send' ? 'active' : ''}`}
           onClick={() => setNotificationMode('send')}
         >
           Send Notifications
         </button>
-        <button 
+        <button
           className={`notification-tab ${notificationMode === 'history' ? 'active' : ''}`}
           onClick={() => setNotificationMode('history')}
         >
           Notification History
         </button>
       </div>
-      
+
       {notificationMode === 'send' ? (
         <div className="send-notification-form">
           <h3>Send New Notification</h3>
-          
+
           <form onSubmit={handleSendNotification}>
             <div className="admin-form-group">
               <label className="admin-form-label">Recipients</label>
-              <select 
-                className="admin-form-control" 
+              <select
+                className="admin-form-control"
                 value={selectedUserType}
                 onChange={(e) => setSelectedUserType(e.target.value)}
               >
                 <option value="all">All Users</option>
-                <option value="buyers">Buyers Only</option>
-                <option value="sellers">Sellers Only</option>
-                <option value="exchangers">Exchangers Only</option>
-                <option value="valuation">Valuation Requesters</option>
               </select>
             </div>
-            
+
             <div className="admin-form-group">
               <label className="admin-form-label">Notification Subject</label>
-              <input 
-                type="text" 
-                className="admin-form-control" 
+              <input
+                type="text"
+                className="admin-form-control"
                 value={notificationSubject}
                 onChange={(e) => setNotificationSubject(e.target.value)}
                 placeholder="Enter notification subject"
               />
             </div>
-            
+
             <div className="admin-form-group">
               <label className="admin-form-label">Notification Content</label>
-              <textarea 
-                className="admin-form-control admin-form-textarea" 
+              <textarea
+                className="admin-form-control admin-form-textarea"
                 value={notificationContent}
                 onChange={(e) => setNotificationContent(e.target.value)}
                 placeholder="Enter notification content"
                 rows="6"
               ></textarea>
             </div>
-            
+
             <div className="admin-form-actions">
               <button type="submit" className="admin-btn admin-btn-primary">
                 Send Notification
@@ -152,7 +150,7 @@ const NotificationCenter = () => {
       ) : (
         <div className="notification-history">
           <h3>Sent Notifications</h3>
-          
+
           <table className="admin-table">
             <thead>
               <tr>
@@ -172,13 +170,13 @@ const NotificationCenter = () => {
                   <td>{notification.status}</td>
                   <td>
                     <div className="admin-table-actions">
-                      <button 
+                      <button
                         className="admin-table-btn admin-table-btn-view"
                         onClick={() => handleViewNotification(notification)}
                       >
                         View
                       </button>
-                      <button 
+                      <button
                         className="admin-table-btn admin-table-btn-edit"
                         onClick={() => handleResendNotification(notification)}
                       >
@@ -192,7 +190,7 @@ const NotificationCenter = () => {
           </table>
         </div>
       )}
-      
+
       {/* Notification View Modal */}
       {showNotificationModal && selectedNotification && (
         <div className="admin-modal-backdrop" onClick={() => setShowNotificationModal(false)}>
@@ -206,12 +204,12 @@ const NotificationCenter = () => {
                 <p><strong>Recipients:</strong> {selectedNotification.recipients}</p>
                 <p><strong>Date Sent:</strong> {selectedNotification.date}</p>
                 <p><strong>Status:</strong> {selectedNotification.status}</p>
-                
+
                 <div className="notification-content">
                   <h4>Content</h4>
                   <div className="notification-preview" style={{
-                    padding: '15px', 
-                    border: '1px solid #e0e9f5', 
+                    padding: '15px',
+                    border: '1px solid #e0e9f5',
                     borderRadius: '6px',
                     marginTop: '10px',
                     backgroundColor: '#f8fafc'
@@ -222,7 +220,7 @@ const NotificationCenter = () => {
                         <p>We're excited to announce a new feature: Account Valuation!</p>
                         <p>Now you can get a professional valuation of your digital account before listing it for sale. Our experts will assess the value based on market trends and account specifics.</p>
                         <p>Try it today by navigating to the "Get Valuation" option in your dashboard.</p>
-                        <p>Best regards,<br/>The AccFlipper Team</p>
+                        <p>Best regards,<br />The AccFlipper Team</p>
                       </>
                     ) : selectedNotification.subject === 'Important: Terms of Service Update' ? (
                       <>
@@ -250,13 +248,13 @@ const NotificationCenter = () => {
               </div>
             </div>
             <div className="admin-modal-footer">
-              <button 
+              <button
                 className="admin-btn admin-btn-secondary"
                 onClick={() => setShowNotificationModal(false)}
               >
                 Close
               </button>
-              <button 
+              <button
                 className="admin-btn admin-btn-primary"
                 onClick={() => {
                   handleResendNotification(selectedNotification);
