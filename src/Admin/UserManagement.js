@@ -22,20 +22,24 @@ const UserManagement = ({ initialFilter = 'all' }) => {
   }, [initialFilter]);
 
   const filteredUsers = users.filter(user => {
+    // Show all users if filterStatus is "all"
+    if (filterStatus === 'all') {
+      return true;
+    }
+  
     // Filter by status
-    if (filterStatus !== 'all' && user.status.toLowerCase() !== filterStatus) {
+    if (user.status.toLowerCase() !== filterStatus) {
       return false;
     }
-
+  
     // Filter by search query
     if (searchQuery && !user.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !user.email.toLowerCase().includes(searchQuery.toLowerCase())) {
+        !user.email.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-
+  
     return true;
   });
-
   const handleViewUser = async (user) => {
     setSelectedUser(user);
     setShowUserModal(true);
@@ -102,6 +106,7 @@ const UserManagement = ({ initialFilter = 'all' }) => {
       const data = await response.json();
       console.log('Users:', data[0].timestamp);
       setUsers(data);
+      setFilterStatus('all');
     } catch (error) {
       console.error(error);
     }
