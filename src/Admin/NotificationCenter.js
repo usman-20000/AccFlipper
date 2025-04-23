@@ -148,47 +148,48 @@ const NotificationCenter = () => {
           </form>
         </div>
       ) : (
-        <div className="notification-history">
-          <h3>Sent Notifications</h3>
+        // <div className="notification-history">
+        //   <h3>Sent Notifications</h3>
 
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Recipients</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sentNotifications.map(notification => (
-                <tr key={notification.id}>
-                  <td>{notification.subject}</td>
-                  <td>{notification.recipients}</td>
-                  <td>{notification.date}</td>
-                  <td>{notification.status}</td>
-                  <td>
-                    <div className="admin-table-actions">
-                      <button
-                        className="admin-table-btn admin-table-btn-view"
-                        onClick={() => handleViewNotification(notification)}
-                      >
-                        View
-                      </button>
-                      <button
-                        className="admin-table-btn admin-table-btn-edit"
-                        onClick={() => handleResendNotification(notification)}
-                      >
-                        Resend
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        //   <table className="admin-table">
+        //     <thead>
+        //       <tr>
+        //         <th>Subject</th>
+        //         <th>Recipients</th>
+        //         <th>Date</th>
+        //         <th>Status</th>
+        //         <th>Actions</th>
+        //       </tr>
+        //     </thead>
+        //     <tbody>
+        //       {sentNotifications.map(notification => (
+        //         <tr key={notification.id}>
+        //           <td>{notification.subject}</td>
+        //           <td>{notification.recipients}</td>
+        //           <td>{notification.date}</td>
+        //           <td>{notification.status}</td>
+        //           <td>
+        //             <div className="admin-table-actions">
+        //               <button
+        //                 className="admin-table-btn admin-table-btn-view"
+        //                 onClick={() => handleViewNotification(notification)}
+        //               >
+        //                 View
+        //               </button>
+        //               <button
+        //                 className="admin-table-btn admin-table-btn-edit"
+        //                 onClick={() => handleResendNotification(notification)}
+        //               >
+        //                 Resend
+        //               </button>
+        //             </div>
+        //           </td>
+        //         </tr>
+        //       ))}
+        //     </tbody>
+        //   </table>
+        // </div>
+        <></>
       )}
 
       {/* Notification View Modal */}
